@@ -180,7 +180,9 @@ impl Pesc {
             if chs[i].is_numeric() || chs[i] == '_'
                 || chs[i] == '.' {
                     let n = chomp(&chs, i, |c| {
-                        !c.is_numeric() && chs[i] != '_' && chs[i] != '.'
+                        let f = !c.is_numeric() && chs[i] != '_' && chs[i] != '.';
+                        println!("debug: c == {}, res = {}", c, f);
+                        f
                     });
                     i = n.1;
 
