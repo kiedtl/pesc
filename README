@@ -38,7 +38,7 @@ Examples
 | [4]                                                                      |
 | pesc> (0x32ab_4f)   \ push 0x32ab4f to the stack                         |
 | [3320655] 4         \ now there are two items on the stack.              |
-| pesc> @#            \ rotate the first two items, and dup the first one. |
+| pesc> ,#            \ rotate the first two items, and dup the first one. |
 | [4] 4 3320655                                                            |
 |                                                                          |
 +--------------------------------------------------------------------------+
