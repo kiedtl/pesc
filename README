@@ -1,0 +1,44 @@
+PESC
+====
+
+PESC is a calculator, heavily inspired by Joy and `dc`.
+
+
+Features
+========
+
+PESC is:
+
+1. **practical**
+   ...if you can stomach its alien, unintuitive syntax.
+2. **extensible**
+   ...provided that you don't mind programming in a dumbed-down version of
+   Python made for people with severe brain trauma.
+3. **stack-based**
+   ...because everyone loves /bin/dc.
+4. a **calculator**
+   sort of. Maybe it's an esoteric language?
+
+PESC is not:
+
+1. a Wolfram-Alpha replacement.
+2. a full-blown programming environment.
+3. a scripting language.
+
+
+Examples
+========
+
++--------------------------------------------------------------------------+
+|                                                                          |
+| \ comments are started with a '\'                                        |
+| \ notice the terse syntax.                                               |
+|                                                                          |
+| pesc> 2#*           \ push 2 to the stack, dup it, and multiply them.    |
+| [4]                                                                      |
+| pesc> (0x32ab_4f)   \ push 0x32ab4f to the stack                         |
+| [3320655] 4         \ now there are two items on the stack.              |
+| pesc> @#            \ rotate the first two items, and dup the first one. |
+| [4] 4 3320655                                                            |
+|                                                                          |
++--------------------------------------------------------------------------+
