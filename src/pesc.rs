@@ -11,11 +11,10 @@ pub enum PescErrorType {
     // <token> (e.g. "[", "(")
     UnmatchedToken(char),
 
-    // <func>, <expected>
-    NotEnoughArguments(String, usize),
+    NotEnoughArguments,
 
-    // <func>, <expected>, <found>
-    InvalidArgumentType(String, String, String),
+    // <expected>, <found>
+    InvalidArgumentType(String, String),
 
     // <found>
     InvalidNumberLit(String),
@@ -30,10 +29,10 @@ impl ToString for PescErrorType {
                 format!("I have no idea what {} means.", f),
             PescErrorType::UnmatchedToken(t) =>
                 format!("Where's the matching '{}'?", t),
-            PescErrorType::NotEnoughArguments(f, e) =>
-                format!("{} needs {} arguments, OK?", f, e),
-            PescErrorType::InvalidArgumentType(n, a, h) =>
-                format!("{} wanted a {}, but you gave a {}", n, a, h),
+            PescErrorType::NotEnoughArguments =>
+                format!("I need just 1 more argument, OK?"),
+            PescErrorType::InvalidArgumentType(h, a) =>
+                format!("I wanted a {}, but you gave a {}", h, a),
             PescErrorType::InvalidNumberLit(f) =>
                 format!("What makes you think '{}' is a number?", f),
             PescErrorType::EmptyLiteral =>
@@ -66,40 +65,17 @@ impl Display for PescError {
     }
 }
 
-fn pesc_add(st: &mut Vec<PescToken>) -> Result<(), ()> {
-    let (a, b);
-
-    // TODO: make concise
-    if let PescToken::Number(n) = st.pop().unwrap() {
-        a = n;
-    } else {
-        return Err(());
-    }
-
-    if let PescToken::Number(n) = st.pop().unwrap() {
-        b = n;
-    } else {
-        return Err(());
-    }
+fn pesc_add(st: &mut Vec<PescToken>) -> Result<(), PescError> {
+    let a = Pesc::pop_number(st)?;
+    let b = Pesc::pop_number(st)?;
 
     st.push(PescToken::Number(a + b));
     Ok(())
 }
 
-fn pesc_sub(st: &mut Vec<PescToken>) -> Result<(), ()> {
-    let (a, b);
-
-    if let PescToken::Number(n) = st.pop().unwrap() {
-        a = n;
-    } else {
-        return Err(());
-    }
-
-    if let PescToken::Number(n) = st.pop().unwrap() {
-        b = n;
-    } else {
-        return Err(());
-    }
+fn pesc_sub(st: &mut Vec<PescToken>) -> Result<(), PescError> {
+    let a = Pesc::pop_number(st)?;
+    let b = Pesc::pop_number(st)?;
 
     st.push(PescToken::Number(a - b));
     Ok(())
@@ -126,7 +102,7 @@ impl Display for PescToken {
     }
 }
 
-type PescFunc = dyn Fn(&mut Vec<PescToken>) -> Result<(), ()>;
+type PescFunc = dyn Fn(&mut Vec<PescToken>) -> Result<(), PescError>;
 
 pub struct Pesc {
     stack: Vec<PescToken>,
@@ -162,16 +138,17 @@ impl Pesc {
         println!();
     }
 
-    pub fn eval(&mut self, code: &[PescToken]) {
-        code.iter().for_each(|t| {
+    pub fn eval(&mut self, code: &[PescToken]) -> Result<(), PescError> {
+        for t in code {
             match t {
                 PescToken::Symbol(o) => {
-                    (self.funcs[&self.ops[o]])(&mut self.stack)
-                        .unwrap();
+                    (self.funcs[&self.ops[o]])(&mut self.stack)?;
                 },
                 _ => self.stack.push(t.clone()),
             }
-        });
+        }
+
+        Ok(())
     }
 
     pub fn parse(&self, input: &str) -> Result<Vec<PescToken>, PescError> {
@@ -215,16 +192,23 @@ impl Pesc {
 
                     toks.push(PescToken::Number(num));
             } else if chs[i] == '"' {
-                let s = chomp(&chs, i, |c| c == '"');
-                i = s.1;
+                let s = chomp(&chs, i + 1, |c| c == '"');
+                i = s.1 + 1;
                 toks.push(PescToken::Str(s.0));
             } else if chs[i] == '(' {
-                let n = chomp(&chs, i, |c| c == ')');
-                i = n.1;
-                toks.push(PescToken::Number(n.0.parse::<f64>().unwrap()));
+                let n = chomp(&chs, i + 1, |c| c == ')');
+                i = n.1 + 1;
+
+                let num = match n.0.parse::<f64>() {
+                    Ok(o) => o,
+                    Err(_) => return Err(PescError::new(Some(i),
+                        PescErrorType::InvalidNumberLit(n.0)))
+                };
+
+                toks.push(PescToken::Number(num));
             } else if chs[i] == '[' {
-                let s = chomp(&chs, i, |c| c == ']');
-                i = s.1;
+                let s = chomp(&chs, i + 1, |c| c == ']');
+                i = s.1 + 1;
                 toks.push(PescToken::Func(s.0));
             } else if chs[i] == ' ' {
                 i += 1;
@@ -237,4 +221,22 @@ impl Pesc {
 
         Ok(toks)
     }
+
+    pub fn pop_number(st: &mut Vec<PescToken>) -> Result<f64, PescError> {
+        let v = match st.pop() {
+            Some(value) => value,
+            None => return Err(PescError::new(None,
+                    PescErrorType::NotEnoughArguments))
+        };
+
+        if let PescToken::Number(n) = v {
+            Ok(n)
+        } else {
+            Err(PescError::new(None,
+                PescErrorType::InvalidArgumentType(
+                    String::from("number"),
+                    v.to_string())))
+        }
+    }
 }
+
