@@ -65,19 +65,19 @@ impl Display for PescError {
     }
 }
 
-fn pesc_add(st: &mut Vec<PescToken>) -> Result<(), PescError> {
-    let a = Pesc::pop_number(st)?;
-    let b = Pesc::pop_number(st)?;
+fn pesc_add(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
 
-    st.push(PescToken::Number(a + b));
+    p.push(PescToken::Number(a + b));
     Ok(())
 }
 
-fn pesc_sub(st: &mut Vec<PescToken>) -> Result<(), PescError> {
-    let a = Pesc::pop_number(st)?;
-    let b = Pesc::pop_number(st)?;
+fn pesc_sub(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
 
-    st.push(PescToken::Number(a - b));
+    p.push(PescToken::Number(a - b));
     Ok(())
 }
 
@@ -102,13 +102,12 @@ impl Display for PescToken {
     }
 }
 
-type PescFunc = dyn Fn(&mut Vec<PescToken>) -> Result<(), PescError>;
+type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescError>;
 
 pub struct Pesc {
     stack: Vec<PescToken>,
-    ops: HashMap<char, String>,
-
     funcs: Rc<HashMap<String, Box<PescFunc>>>,
+    ops: HashMap<char, String>,
 }
 
 impl Pesc {
@@ -119,10 +118,8 @@ impl Pesc {
 
         let mut funcs: HashMap<String, Box<PescFunc>> = HashMap::new();
 
-        funcs.insert(String::from("add"),
-            Box::new(|s| pesc_add(s)));
-        funcs.insert(String::from("sub"),
-            Box::new(|s| pesc_sub(s)));
+        funcs.insert(String::from("add"), Box::new(|s| pesc_add(s)));
+        funcs.insert(String::from("sub"), Box::new(|s| pesc_sub(s)));
 
         Self {
             stack: Vec::new(),
@@ -142,7 +139,8 @@ impl Pesc {
         for t in code {
             match t {
                 PescToken::Symbol(o) => {
-                    (self.funcs[&self.ops[o]])(&mut self.stack)?;
+                    let funcs = (&self.funcs).clone();
+                    (funcs[&self.ops[o]])(self)?;
                 },
                 _ => self.stack.push(t.clone()),
             }
@@ -239,8 +237,12 @@ impl Pesc {
         Ok((i, toks))
     }
 
-    pub fn pop_number(st: &mut Vec<PescToken>) -> Result<f64, PescError> {
-        let v = match st.pop() {
+    pub fn push(&mut self, v: PescToken) {
+        self.stack.push(v)
+    }
+
+    pub fn pop_number(&mut self) -> Result<f64, PescError> {
+        let v = match self.stack.pop() {
             Some(value) => value,
             None => return Err(PescError::new(None,
                     PescErrorType::NotEnoughArguments))
