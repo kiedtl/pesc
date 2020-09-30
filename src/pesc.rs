@@ -214,7 +214,7 @@ impl Pesc {
                 } else {
                     toks.push(PescToken::Func(s.0));
                 }
-            } else if chs[i] == ' ' {
+            } else if chs[i] == ' ' || chs[i] == '\n' {
                 i += 1;
                 continue;
             } else {
