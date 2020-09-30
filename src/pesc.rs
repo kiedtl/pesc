@@ -180,13 +180,11 @@ impl Pesc {
             if chs[i].is_numeric() || chs[i] == '_'
                 || chs[i] == '.' {
                     let n = chomp(&chs, i, |c| {
-                        let f = !c.is_numeric() && chs[i] != '_' && chs[i] != '.';
-                        println!("debug: c == {}, res = {}", c, f);
-                        f
+                        !c.is_digit(10) && c != '_' && c != '.'
                     });
                     i = n.1;
 
-                    let num = match n.0.parse::<f64>() {
+                    let num = match n.0.replace("_", "").parse::<f64>() {
                         Ok(o) => o,
                         Err(_) => return Err(PescError::new(Some(i),
                             PescErrorType::InvalidNumberLit(n.0)))
@@ -201,7 +199,7 @@ impl Pesc {
                 let n = chomp(&chs, i + 1, |c| c == ')');
                 i = n.1 + 1;
 
-                let num = match n.0.parse::<f64>() {
+                let num = match n.0.replace("_", "").parse::<f64>() {
                     Ok(o) => o,
                     Err(_) => return Err(PescError::new(Some(i),
                         PescErrorType::InvalidNumberLit(n.0)))
