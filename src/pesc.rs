@@ -209,7 +209,13 @@ impl Pesc {
             } else if chs[i] == '[' {
                 let s = chomp(&chs, i + 1, |c| c == ']');
                 i = s.1 + 1;
-                toks.push(PescToken::Func(s.0));
+
+                if !self.funcs.contains_key(&s.0) {
+                    return Err(PescError::new(None,
+                        PescErrorType::UnknownFunction(s.0)));
+                } else {
+                    toks.push(PescToken::Func(s.0));
+                }
             } else if chs[i] == ' ' {
                 i += 1;
                 continue;
