@@ -173,9 +173,7 @@ impl Pesc {
         }
 
         while i < chs.len() {
-            // TODO: handle numeric parsing errors
             // TODO: parse macros
-            // TODO: match functions before pushing
 
             if chs[i].is_numeric() || chs[i] == '_'
                 || chs[i] == '.' {
@@ -220,7 +218,13 @@ impl Pesc {
                 i += 1;
                 continue;
             } else {
-                toks.push(PescToken::Symbol(chs[i]));
+                if !self.ops.contains_key(&chs[i]) {
+                    return Err(PescError::new(None,
+                        PescErrorType::UnknownFunction(
+                            format!("'{}'", chs[i]))));
+                } else {
+                    toks.push(PescToken::Symbol(chs[i]));
+                }
                 i += 1;
             }
         }
