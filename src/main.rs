@@ -14,7 +14,7 @@ fn main() {
         },
     };
 
-    match pesc.eval(&parsed) {
+    match pesc.eval(&parsed.1) {
         Ok(()) => pesc.print(),
         Err(e) => println!("error: {}", e),
     }

@@ -151,7 +151,9 @@ impl Pesc {
         Ok(())
     }
 
-    pub fn parse(&self, input: &str) -> Result<Vec<PescToken>, PescError> {
+    pub fn parse(&self, input: &str)
+        -> Result<(usize, Vec<PescToken>), PescError>
+    {
         let mut toks = Vec::new();
 
         let chs = input.chars()
@@ -214,6 +216,12 @@ impl Pesc {
                 } else {
                     toks.push(PescToken::Func(s.0));
                 }
+            } else if chs[i] == '{' {
+                let res = self.parse(&input[i + 1..])?;
+                i += res.0 + 1;
+                toks.push(PescToken::Macro(res.1));
+            } else if chs[i] == '}' {
+                return Ok((i, toks));
             } else if chs[i] == ' ' || chs[i] == '\n' {
                 i += 1;
                 continue;
@@ -229,7 +237,8 @@ impl Pesc {
             }
         }
 
-        Ok(toks)
+        println!("returning");
+        Ok((i, toks))
     }
 
     pub fn pop_number(st: &mut Vec<PescToken>) -> Result<f64, PescError> {
