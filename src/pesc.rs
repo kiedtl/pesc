@@ -175,8 +175,6 @@ impl Pesc {
         }
 
         while i < chs.len() {
-            // TODO: parse macros
-
             if chs[i].is_numeric() || chs[i] == '_'
                 || chs[i] == '.' {
                     let n = chomp(&chs, i, |c| {
