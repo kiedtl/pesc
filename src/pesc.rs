@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::fmt::{self, Display};
 use std::collections::HashMap;
-use crate::pescerror::*;
+use crate::errors::*;
 
 fn pesc_add(p: &mut Pesc) -> Result<(), PescError> {
     let a = p.pop_number()?;

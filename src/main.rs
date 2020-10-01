@@ -1,5 +1,5 @@
 mod pesc;
-mod pescerror;
+mod errors;
 use crate::pesc::*;
 
 fn main() {
