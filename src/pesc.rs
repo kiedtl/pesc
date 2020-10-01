@@ -2,7 +2,6 @@ use std::rc::Rc;
 use std::fmt::{self, Display};
 use std::collections::HashMap;
 use crate::errors::*;
-use crate::stdlib::*;
 
 #[derive(Clone, Debug)]
 pub enum PescToken {
