@@ -2,36 +2,7 @@ use std::rc::Rc;
 use std::fmt::{self, Display};
 use std::collections::HashMap;
 use crate::errors::*;
-
-fn pesc_add(p: &mut Pesc) -> Result<(), PescError> {
-    let a = p.pop_number()?;
-    let b = p.pop_number()?;
-
-    p.push(PescToken::Number(a + b));
-    Ok(())
-}
-
-fn pesc_sub(p: &mut Pesc) -> Result<(), PescError> {
-    let a = p.pop_number()?;
-    let b = p.pop_number()?;
-
-    p.push(PescToken::Number(a - b));
-    Ok(())
-}
-
-fn pesc_run(p: &mut Pesc) -> Result<(), PescError> {
-    let sttop = p.pop()?;
-    if let PescToken::Func(func) = sttop {
-        (&p.funcs.clone()[&func])(p)
-    } else if let PescToken::Macro(mac) = sttop {
-        p.eval(&mac)
-    } else {
-        Err(PescError::new(None,
-            PescErrorType::InvalidArgumentType(
-                String::from("macro/function"),
-                sttop.to_string())))
-    }
-}
+use crate::stdlib::*;
 
 #[derive(Clone, Debug)]
 pub enum PescToken {
@@ -57,9 +28,9 @@ impl Display for PescToken {
 type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescError>;
 
 pub struct Pesc {
-    stack: Vec<PescToken>,
-    funcs: Rc<HashMap<String, Box<PescFunc>>>,
-    ops: HashMap<char, String>,
+    pub stack: Vec<PescToken>,
+    pub funcs: Rc<HashMap<String, Box<PescFunc>>>,
+    pub ops: HashMap<char, String>,
 }
 
 impl Pesc {

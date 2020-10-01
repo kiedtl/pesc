@@ -1,5 +1,7 @@
-mod pesc;
 mod errors;
+mod pesc;
+mod stdlib;
+
 use crate::pesc::*;
 
 fn main() {
