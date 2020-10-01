@@ -1,5 +1,19 @@
+use std::rc::Rc;
+use std::vec::Vec;
 use crate::errors::*;
 use crate::pesc::*;
+
+macro_rules! func {
+    ($x:ident) => (Rc::new(Box::new($x)))
+}
+
+pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
+    vec![
+        (Some('+'), "add", func!(pesc_add)),
+        (Some('-'), "sub", func!(pesc_sub)),
+        (Some(';'), "run", func!(pesc_run)),
+    ]
+}
 
 pub fn pesc_add(p: &mut Pesc) -> Result<(), PescError> {
     let a = p.pop_number()?;

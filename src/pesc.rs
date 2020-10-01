@@ -25,31 +25,31 @@ impl Display for PescToken {
     }
 }
 
-type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescError>;
+pub type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescError>;
 
 pub struct Pesc {
     pub stack: Vec<PescToken>,
-    pub funcs: Rc<HashMap<String, Box<PescFunc>>>,
+    pub funcs: HashMap<String, Rc<Box<PescFunc>>>,
     pub ops: HashMap<char, String>,
 }
 
 impl Pesc {
     pub fn new() -> Self {
-        let mut ops = HashMap::new();
-        ops.insert('+', String::from("add"));
-        ops.insert('-', String::from("sub"));
-        ops.insert(';', String::from("run"));
-
-        let mut funcs: HashMap<String, Box<PescFunc>> = HashMap::new();
-
-        funcs.insert(String::from("add"), Box::new(|s| pesc_add(s)));
-        funcs.insert(String::from("sub"), Box::new(|s| pesc_sub(s)));
-        funcs.insert(String::from("run"), Box::new(|s| pesc_run(s)));
-
         Self {
             stack: Vec::new(),
-            ops: ops, funcs: Rc::new(funcs),
+            funcs: HashMap::new(),
+            ops: HashMap::new(),
         }
+    }
+
+    pub fn load(&mut self, op: Option<char>, fnname: &str,
+        func: Rc<Box<PescFunc>>)
+    {
+        if let Some(o) = op {
+            self.ops.insert(o, String::from(fnname));
+        }
+
+        self.funcs.insert(String::from(fnname), func);
     }
 
     pub fn print(&self) {
