@@ -81,6 +81,20 @@ fn pesc_sub(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
+fn pesc_run(p: &mut Pesc) -> Result<(), PescError> {
+    let sttop = p.pop()?;
+    if let PescToken::Func(func) = sttop {
+        (&p.funcs.clone()[&func])(p)
+    } else if let PescToken::Macro(mac) = sttop {
+        p.eval(&mac)
+    } else {
+        Err(PescError::new(None,
+            PescErrorType::InvalidArgumentType(
+                String::from("macro/function"),
+                sttop.to_string())))
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum PescToken {
     Str(String),
@@ -115,11 +129,13 @@ impl Pesc {
         let mut ops = HashMap::new();
         ops.insert('+', String::from("add"));
         ops.insert('-', String::from("sub"));
+        ops.insert(';', String::from("run"));
 
         let mut funcs: HashMap<String, Box<PescFunc>> = HashMap::new();
 
         funcs.insert(String::from("add"), Box::new(|s| pesc_add(s)));
         funcs.insert(String::from("sub"), Box::new(|s| pesc_sub(s)));
+        funcs.insert(String::from("run"), Box::new(|s| pesc_run(s)));
 
         Self {
             stack: Vec::new(),
@@ -241,12 +257,16 @@ impl Pesc {
         self.stack.push(v)
     }
 
-    pub fn pop_number(&mut self) -> Result<f64, PescError> {
-        let v = match self.stack.pop() {
-            Some(value) => value,
-            None => return Err(PescError::new(None,
+    pub fn pop(&mut self) -> Result<PescToken, PescError> {
+        match self.stack.pop() {
+            Some(value) => Ok(value),
+            None => Err(PescError::new(None,
                     PescErrorType::NotEnoughArguments))
-        };
+        }
+    }
+
+    pub fn pop_number(&mut self) -> Result<f64, PescError> {
+        let v = self.pop()?;
 
         if let PescToken::Number(n) = v {
             Ok(n)
