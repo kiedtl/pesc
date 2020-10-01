@@ -18,6 +18,8 @@ pub enum PescErrorType {
     InvalidNumberLit(String),
 
     EmptyLiteral,
+
+    DivideByZero(f64, f64),
 }
 
 impl ToString for PescErrorType {
@@ -35,6 +37,8 @@ impl ToString for PescErrorType {
                 format!("What makes you think '{}' is a number?", f),
             PescErrorType::EmptyLiteral =>
                 format!("I don't know what to do with an empty literal."),
+            PescErrorType::DivideByZero(a, b) =>
+                format!("You can't divide {} by {}, so don't try.", a, b),
         }
     }
 }
