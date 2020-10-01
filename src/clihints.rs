@@ -49,10 +49,13 @@ pub fn hints(p: &Pesc) -> HashSet<String> {
 
     // some hints ;)
     set.insert(String::from("help // read the manpage, dummy"));
-    set.insert(String::from("quit // just hit Ctrl-D"));
-    set.insert(String::from("exit // it's ^D to quit. Ctrl-D."));
     set.insert(String::from("man  // `man pesc`, if your package manager's worth anything."));
     set.insert(String::from("man pesc // no, you need to exit first."));
+    set.insert(String::from("quit // just hit Ctrl-D"));
+    set.insert(String::from("exit // it's ^D to quit. Ctrl-D."));
+    set.insert(String::from("nice // gee, thanks"));
+    set.insert(String::from("lol  // what's so funny?"));
+    set.insert(String::from("what // maybe you need to take a look at the manpage"));
 
     p.funcs.iter().for_each(|f| {
         set.insert(format!("[{}]", f.0));

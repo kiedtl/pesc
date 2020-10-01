@@ -38,6 +38,8 @@ fn main() {
             Ok(()) => pesc.print(),
             Err(e) => println!("error: {}", e),
         }
+
+        return;
     }
 
     // nope, display a pretty prompt & take orders
