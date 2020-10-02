@@ -3,13 +3,14 @@ use std::fmt::{self, Display};
 use std::collections::HashMap;
 use crate::errors::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum PescToken {
     Str(String),
     Number(f64),
     Func(String),
     Macro(Vec<PescToken>),
     Symbol(char),
+    Bool(bool),
 }
 
 impl Display for PescToken {
@@ -18,8 +19,9 @@ impl Display for PescToken {
             PescToken::Macro(m) => write!(f, "<mac {:p}>", m),
             PescToken::Symbol(y) => write!(f, "<sym '{}'>", y),
             PescToken::Str(s) => write!(f, "{:?}", s),
-            PescToken::Number(n) => write!(f, "{}", n),
+            PescToken::Number(n) => write!(f, "[{}]", n),
             PescToken::Func(s) => write!(f, "<fn {}>", s),
+            PescToken::Bool(b) => write!(f, "({})", b),
         }
     }
 }
@@ -71,6 +73,16 @@ impl Pesc {
         }
 
         Ok(())
+    }
+
+    pub fn try_exec(&mut self, tok: PescToken) -> Result<(), PescError> {
+        match tok {
+            PescToken::Func(func) => (&self.funcs.clone()[&func])(self),
+            PescToken::Macro(mac) => self.eval(&mac),
+            _ => Err(PescError::new(None,
+                PescErrorType::InvalidArgumentType(
+                    String::from("macro/function"), tok.to_string())))
+        }
     }
 
     pub fn parse(&self, input: &str)
@@ -145,6 +157,12 @@ impl Pesc {
             } else if chs[i] == ' ' || chs[i] == '\n' {
                 i += 1;
                 continue;
+            } else if chs[i] == 'T' {
+                toks.push(PescToken::Bool(true));
+                i += 1;
+            } else if chs[i] == 'F' {
+                toks.push(PescToken::Bool(false));
+                i += 1;
             } else {
                 if !self.ops.contains_key(&chs[i]) {
                     return Err(PescError::new(None,
@@ -199,6 +217,25 @@ impl Pesc {
                 PescErrorType::InvalidArgumentType(
                     String::from("number"),
                     v.to_string())))
+        }
+    }
+
+    pub fn pop_boolean(&mut self) -> Result<bool, PescError> {
+        let v = self.pop()?;
+        match v {
+            PescToken::Str(s) => if s == String::from("") {
+                Ok(false)
+            } else {
+                Ok(true)
+            },
+            PescToken::Number(n) => if n == 0_f64 {
+                Ok(false)
+            } else {
+                Ok(true)
+            },
+            PescToken::Bool(b) => Ok(b),
+            _ => Err(PescError::new(None,
+                    PescErrorType::InvalidBoolean(v)))
         }
     }
 }

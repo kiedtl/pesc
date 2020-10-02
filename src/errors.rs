@@ -1,5 +1,6 @@
 use std::fmt::{self, Display};
 use std::error::*;
+use crate::pesc::*;
 
 #[derive(Clone, Debug)]
 pub enum PescErrorType {
@@ -24,6 +25,9 @@ pub enum PescErrorType {
 
     // <index>
     OutOfBounds(f64),
+
+    // <found>
+    InvalidBoolean(PescToken),
 }
 
 impl ToString for PescErrorType {
@@ -45,6 +49,8 @@ impl ToString for PescErrorType {
                 format!("You can't divide {} by {}, so don't try.", a, b),
             PescErrorType::OutOfBounds(i) =>
                 format!("The stack isn't as big as you think ({} is out of bounds)", *i as usize),
+            PescErrorType::InvalidBoolean(found) =>
+                format!("Uh, is {} supposed to be true or false?", found),
         }
     }
 }

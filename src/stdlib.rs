@@ -24,6 +24,14 @@ pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
         (Some('ø'), "get", func!(pesc_get)),
         (Some('@'), "rot", func!(pesc_rot)),
 
+        (Some('!'), "neg", func!(pesc_b_neg)),
+        (Some('&'), "and", func!(pesc_b_and)),
+        (Some('|'), "or",  func!(pesc_b_or)),
+        (Some('='), "eq?", func!(pesc_b_eq)),
+        (Some('<'), "gt?", func!(pesc_b_gt)),
+        (Some('>'), "lt?", func!(pesc_b_lt)),
+        (Some('?'), "if?", func!(pesc_b_cond)),
+
         (Some(';'), "run", func!(pesc_run)),
     ]
 }
@@ -124,6 +132,67 @@ pub fn pesc_rot(p: &mut Pesc) -> Result<(), PescError> {
 
     p.set(0.0,   nth)?;
     p.set(idx, first)?;
+    Ok(())
+}
+
+// --- boolean functions ---
+
+pub fn pesc_b_neg(p: &mut Pesc) -> Result<(), PescError> {
+    let v = !p.pop_boolean()?;
+    p.push(PescToken::Bool(v));
+    Ok(())
+}
+
+pub fn pesc_b_and(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop_boolean()?;
+    let b = p.pop_boolean()?;
+
+    p.push(PescToken::Bool(a && b));
+    Ok(())
+}
+
+pub fn pesc_b_or(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop_boolean()?;
+    let b = p.pop_boolean()?;
+
+    p.push(PescToken::Bool(a || b));
+    Ok(())
+}
+
+pub fn pesc_b_eq(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop()?;
+    let b = p.pop()?;
+
+    p.push(PescToken::Bool(a == b));
+    Ok(())
+}
+
+pub fn pesc_b_gt(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    p.push(PescToken::Bool(a < b));
+    Ok(())
+}
+
+pub fn pesc_b_lt(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    p.push(PescToken::Bool(a > b));
+    Ok(())
+}
+
+pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescError> {
+    let cond = p.pop_boolean()?;
+    let main_branch = p.pop()?;
+    let else_branch = p.pop()?;
+
+    match cond {
+        true  => p.try_exec(main_branch)?,
+        false => p.try_exec(else_branch)?,
+    }
+
     Ok(())
 }
 
