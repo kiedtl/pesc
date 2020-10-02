@@ -110,6 +110,7 @@ impl Pesc {
 
         while i < chs.len() {
             match chs[i] {
+                // integer literals
                 _ if chs[i].is_numeric() || chs[i] == '.'
                                          || chs[i] == '_' => {
                     let n = chomp(&chs, i, |c| {
@@ -126,12 +127,6 @@ impl Pesc {
                     toks.push(PescToken::Number(num));
                 },
 
-                '"' => {
-                    let s = chomp(&chs, i + 1, |c| c == '"');
-                    i = s.1 + 1;
-                    toks.push(PescToken::Str(s.0));
-                },
-
                 '(' => {
                     let n = chomp(&chs, i + 1, |c| c == ')');
                     i = n.1 + 1;
@@ -145,6 +140,14 @@ impl Pesc {
                     toks.push(PescToken::Number(num));
                 },
 
+                // strings
+                '"' => {
+                    let s = chomp(&chs, i + 1, |c| c == '"');
+                    i = s.1 + 1;
+                    toks.push(PescToken::Str(s.0));
+                },
+
+                // functions
                 '[' => {
                     let s = chomp(&chs, i + 1, |c| c == ']');
                     i = s.1 + 1;
@@ -157,6 +160,7 @@ impl Pesc {
                     }
                 },
 
+                // macros
                 '{' => {
                     let res = self.parse(&input[i + 1..])?;
                     toks.push(PescToken::Macro(res.1));
@@ -168,12 +172,15 @@ impl Pesc {
 
                 '}' => return Ok((i, toks)),
 
+                // whitespace
                 '\n'
                 | ' ' => { i += 1; continue; },
 
+                // comments
                 '\\' =>
                     i = chomp(&chs, i + 1, |c| c == '\n' || c == '\\').1 + 1,
 
+                // boolean values
                 'T' => {
                     toks.push(PescToken::Bool(true));
                     i += 1;
@@ -184,6 +191,7 @@ impl Pesc {
                     i += 1;
                 },
 
+                // treat unknown characters as symbols aka operators
                 _ => {
                     if !self.ops.contains_key(&chs[i]) {
                         return Err(PescError::new(None,
