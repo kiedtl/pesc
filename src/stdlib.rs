@@ -199,15 +199,6 @@ pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescError> {
 // --- misc functions ---
 
 pub fn pesc_run(p: &mut Pesc) -> Result<(), PescError> {
-    let sttop = p.pop()?;
-    if let PescToken::Func(func) = sttop {
-        (&p.funcs.clone()[&func])(p)
-    } else if let PescToken::Macro(mac) = sttop {
-        p.eval(&mac)
-    } else {
-        Err(PescError::new(None,
-            PescErrorType::InvalidArgumentType(
-                String::from("macro/function"),
-                sttop.to_string())))
-    }
+    let f = p.pop()?;
+    p.try_exec(f)
 }

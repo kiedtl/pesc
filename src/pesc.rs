@@ -174,7 +174,7 @@ impl Pesc {
 
                 // whitespace
                 '\n'
-                '\t'
+                | '\t'
                 | ' ' => { i += 1; continue; },
 
                 // comments
