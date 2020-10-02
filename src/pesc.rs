@@ -125,11 +125,13 @@ impl Pesc {
 
                     toks.push(PescToken::Number(num));
                 },
+
                 '"' => {
                     let s = chomp(&chs, i + 1, |c| c == '"');
                     i = s.1 + 1;
                     toks.push(PescToken::Str(s.0));
                 },
+
                 '(' => {
                     let n = chomp(&chs, i + 1, |c| c == ')');
                     i = n.1 + 1;
@@ -142,6 +144,7 @@ impl Pesc {
 
                     toks.push(PescToken::Number(num));
                 },
+
                 '[' => {
                     let s = chomp(&chs, i + 1, |c| c == ']');
                     i = s.1 + 1;
@@ -153,6 +156,7 @@ impl Pesc {
                         toks.push(PescToken::Func(s.0));
                     }
                 },
+
                 '{' => {
                     let res = self.parse(&input[i + 1..])?;
                     toks.push(PescToken::Macro(res.1));
@@ -161,17 +165,25 @@ impl Pesc {
                     // will exit prematurely (see next item)
                     i += res.0 + 2;
                 },
+
                 '}' => return Ok((i, toks)),
+
                 '\n'
                 | ' ' => { i += 1; continue; },
+
+                '\\' =>
+                    i = chomp(&chs, i + 1, |c| c == '\n' || c == '\\').1 + 1,
+
                 'T' => {
                     toks.push(PescToken::Bool(true));
                     i += 1;
                 },
+
                 'F' => {
                     toks.push(PescToken::Bool(false));
                     i += 1;
                 },
+
                 _ => {
                     if !self.ops.contains_key(&chs[i]) {
                         return Err(PescError::new(None,
