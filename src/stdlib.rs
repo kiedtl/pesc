@@ -16,6 +16,13 @@ pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
         (Some('*'), "sub", func!(pesc_mul)),
         (Some('/'), "sub", func!(pesc_div)),
         (Some('^'), "sub", func!(pesc_pow)),
+
+        (Some('#'), "dup", func!(pesc_dup)),
+        (Some('$'), "pop", func!(pesc_pop)),
+        (Some(','), "swp", func!(pesc_swp)),
+        (Some('ø'), "get", func!(pesc_get)),
+        (Some('@'), "rot", func!(pesc_rot)),
+
         (Some(';'), "run", func!(pesc_run)),
     ]
 }
@@ -66,7 +73,48 @@ pub fn pesc_pow(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-// misc functions
+// --- stack functions ---
+
+pub fn pesc_dup(p: &mut Pesc) -> Result<(), PescError> {
+    let x = p.pop()?;
+    p.push(x.clone()); p.push(x);
+    Ok(())
+}
+
+pub fn pesc_pop(p: &mut Pesc) -> Result<(), PescError> {
+    p.pop()?;
+    Ok(())
+}
+
+pub fn pesc_swp(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop()?;
+    let b = p.pop()?;
+
+    p.push(a); p.push(b);
+    Ok(())
+}
+
+pub fn pesc_get(p: &mut Pesc) -> Result<(), PescError> {
+    // copy the nth item on the stack and dup
+    let nth = p.pop_number()?;
+    let x   = p.nth_ref(nth)?.clone();
+
+    p.push(x);
+    Ok(())
+}
+
+pub fn pesc_rot(p: &mut Pesc) -> Result<(), PescError> {
+    // swap the nth item on the stack with the first item
+    let idx   = p.pop_number()?;
+    let nth   = p.nth_ref(idx)?.clone();
+    let first = p.nth_ref(0.0)?.clone();
+
+    p.set(0.0,   nth)?;
+    p.set(idx, first)?;
+    Ok(())
+}
+
+// --- misc functions ---
 
 pub fn pesc_run(p: &mut Pesc) -> Result<(), PescError> {
     let sttop = p.pop()?;

@@ -19,7 +19,11 @@ pub enum PescErrorType {
 
     EmptyLiteral,
 
+    // <a>, <b>
     DivideByZero(f64, f64),
+
+    // <index>
+    OutOfBounds(f64),
 }
 
 impl ToString for PescErrorType {
@@ -39,6 +43,8 @@ impl ToString for PescErrorType {
                 format!("I don't know what to do with an empty literal."),
             PescErrorType::DivideByZero(a, b) =>
                 format!("You can't divide {} by {}, so don't try.", a, b),
+            PescErrorType::OutOfBounds(i) =>
+                format!("The stack isn't as big as you think ({} is out of bounds)", *i as usize),
         }
     }
 }

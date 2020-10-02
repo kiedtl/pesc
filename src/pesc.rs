@@ -160,6 +160,23 @@ impl Pesc {
         Ok((i, toks))
     }
 
+    pub fn nth_ref(&self, i: f64) -> Result<&PescToken, PescError> {
+        match self.stack.iter().rev().nth(i as usize) {
+            Some(value) => Ok(value),
+            None => Err(PescError::new(None, PescErrorType::OutOfBounds(i))),
+        }
+    }
+
+    pub fn set(&mut self, i: f64, v: PescToken) -> Result<(), PescError> {
+        let len = self.stack.len();
+        if len <= i as usize {
+            Err(PescError::new(None, PescErrorType::OutOfBounds(i)))
+        } else {
+            self.stack[(len - 1) - (i as usize)] = v;
+            Ok(())
+        }
+    }
+
     pub fn push(&mut self, v: PescToken) {
         self.stack.push(v)
     }
