@@ -16,7 +16,7 @@ pub enum PescToken {
 impl Display for PescToken {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
-            PescToken::Macro(m) => write!(f, "<mac {:p}>", m),
+            PescToken::Macro(m) => write!(f, "<mac {:?}>", m),
             PescToken::Symbol(y) => write!(f, "<sym '{}'>", y),
             PescToken::Str(s) => write!(f, "{:?}", s),
             PescToken::Number(n) => write!(f, "[{}]", n),
@@ -150,8 +150,11 @@ impl Pesc {
                 }
             } else if chs[i] == '{' {
                 let res = self.parse(&input[i + 1..])?;
-                i += res.0 + 1;
                 toks.push(PescToken::Macro(res.1));
+
+                // move pointer past matching '}', or we
+                // will exit prematurely (see next item)
+                i += res.0 + 2;
             } else if chs[i] == '}' {
                 return Ok((i, toks));
             } else if chs[i] == ' ' || chs[i] == '\n' {
