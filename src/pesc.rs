@@ -19,7 +19,7 @@ impl Display for PescToken {
             PescToken::Macro(m) => write!(f, "<mac {:?}>", m),
             PescToken::Symbol(y) => write!(f, "<sym '{}'>", y),
             PescToken::Str(s) => write!(f, "{:?}", s),
-            PescToken::Number(n) => write!(f, "[{}]", n),
+            PescToken::Number(n) => write!(f, "{}", n),
             PescToken::Func(s) => write!(f, "<fn {}>", s),
             PescToken::Bool(b) => write!(f, "({})", b),
         }
@@ -57,11 +57,7 @@ impl Pesc {
     }
 
     pub fn print(&self) {
-        for i in self.m_stack.iter().rev() {
-            print!("[{}] ", i);
-        }
-
-        println!();
+        self.m_stack.iter().rev().for_each(|i| println!("{} ", i));
     }
 
     pub fn eval(&mut self, code: &[PescToken]) -> Result<(), PescError> {

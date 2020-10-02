@@ -2,9 +2,12 @@ mod errors;
 mod pesc;
 mod stdlib;
 mod clihints;
+mod tty;
+mod output;
 
 use crate::pesc::*;
 use crate::clihints::*;
+use crate::output::*;
 
 use rustyline::{
     config::{
@@ -17,6 +20,7 @@ use rustyline::{
 
 fn main() {
     let mut pesc = Pesc::new();
+    let output = OutputMode::auto();
 
     for func in stdlib::functions() {
         pesc.load(func.0, func.1, func.2);
@@ -35,7 +39,7 @@ fn main() {
         };
 
         match pesc.eval(&parsed.1) {
-            Ok(()) => pesc.print(),
+            Ok(()) => output.format_stack(&pesc),
             Err(e) => println!("error: {}", e),
         }
 
@@ -69,12 +73,12 @@ fn main() {
                     Err(e) => println!("error: {}", e),
                 }
 
-                pesc.print();
+                output.format_stack(&pesc);
             },
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) =>
                 println!("Use Ctrl-D to quit."),
-            Err(_) => pesc.print(),
+            Err(_) => output.format_stack(&pesc),
         }
     }
 }
