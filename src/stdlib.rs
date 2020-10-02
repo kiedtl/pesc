@@ -16,6 +16,7 @@ pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
         (Some('*'), "mul", func!(pesc_mul)),
         (Some('/'), "div", func!(pesc_div)),
         (Some('^'), "pow", func!(pesc_pow)),
+        (Some('%'), "mod", func!(pesc_mod)),
 
         (Some('#'), "dup", func!(pesc_dup)),
         (Some('$'), "pop", func!(pesc_pop)),
@@ -71,6 +72,18 @@ pub fn pesc_pow(p: &mut Pesc) -> Result<(), PescError> {
 
     p.push(PescToken::Number(a.powf(b)));
     Ok(())
+}
+
+pub fn pesc_mod(p: &mut Pesc) -> Result<(), PescError> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    if b == 0_f64 {
+        Err(PescError::new(None, PescErrorType::DivideByZero(a, b)))
+    } else {
+        p.push(PescToken::Number(a % b));
+        Ok(())
+    }
 }
 
 // --- stack functions ---
