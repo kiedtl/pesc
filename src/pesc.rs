@@ -64,10 +64,7 @@ impl Pesc {
     pub fn eval(&mut self, code: &[PescToken]) -> Result<(), PescError> {
         for t in code {
             match t {
-                PescToken::Symbol(o) => {
-                    let funcs = (&self.funcs).clone();
-                    (funcs[&self.ops[o]])(self)?;
-                },
+                PescToken::Symbol(o) => self.try_exec(PescToken::Func(self.ops[o].clone()))?,
                 _ => self.stack.push(t.clone()),
             }
         }
