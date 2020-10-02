@@ -13,9 +13,9 @@ pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
         (Some('+'), "add", func!(pesc_add)),
         (Some('-'), "sub", func!(pesc_sub)),
-        (Some('*'), "sub", func!(pesc_mul)),
-        (Some('/'), "sub", func!(pesc_div)),
-        (Some('^'), "sub", func!(pesc_pow)),
+        (Some('*'), "mul", func!(pesc_mul)),
+        (Some('/'), "div", func!(pesc_div)),
+        (Some('^'), "pow", func!(pesc_pow)),
 
         (Some('#'), "dup", func!(pesc_dup)),
         (Some('$'), "pop", func!(pesc_pop)),
