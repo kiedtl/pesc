@@ -109,8 +109,9 @@ impl Pesc {
         }
 
         while i < chs.len() {
-            if chs[i].is_numeric() || chs[i] == '_'
-                || chs[i] == '.' {
+            match chs[i] {
+                _ if chs[i].is_numeric() || chs[i] == '.'
+                                         || chs[i] == '_' => {
                     let n = chomp(&chs, i, |c| {
                         !c.is_digit(10) && c != '_' && c != '.'
                     });
@@ -123,58 +124,64 @@ impl Pesc {
                     };
 
                     toks.push(PescToken::Number(num));
-            } else if chs[i] == '"' {
-                let s = chomp(&chs, i + 1, |c| c == '"');
-                i = s.1 + 1;
-                toks.push(PescToken::Str(s.0));
-            } else if chs[i] == '(' {
-                let n = chomp(&chs, i + 1, |c| c == ')');
-                i = n.1 + 1;
+                },
+                '"' => {
+                    let s = chomp(&chs, i + 1, |c| c == '"');
+                    i = s.1 + 1;
+                    toks.push(PescToken::Str(s.0));
+                },
+                '(' => {
+                    let n = chomp(&chs, i + 1, |c| c == ')');
+                    i = n.1 + 1;
 
-                let num = match n.0.replace("_", "").parse::<f64>() {
-                    Ok(o) => o,
-                    Err(_) => return Err(PescError::new(Some(i),
-                        PescErrorType::InvalidNumberLit(n.0)))
-                };
+                    let num = match n.0.replace("_", "").parse::<f64>() {
+                        Ok(o) => o,
+                        Err(_) => return Err(PescError::new(Some(i),
+                            PescErrorType::InvalidNumberLit(n.0)))
+                    };
 
-                toks.push(PescToken::Number(num));
-            } else if chs[i] == '[' {
-                let s = chomp(&chs, i + 1, |c| c == ']');
-                i = s.1 + 1;
+                    toks.push(PescToken::Number(num));
+                },
+                '[' => {
+                    let s = chomp(&chs, i + 1, |c| c == ']');
+                    i = s.1 + 1;
 
-                if !self.funcs.contains_key(&s.0) {
-                    return Err(PescError::new(None,
-                        PescErrorType::UnknownFunction(s.0)));
-                } else {
-                    toks.push(PescToken::Func(s.0));
+                    if !self.funcs.contains_key(&s.0) {
+                        return Err(PescError::new(None,
+                            PescErrorType::UnknownFunction(s.0)));
+                    } else {
+                        toks.push(PescToken::Func(s.0));
+                    }
+                },
+                '{' => {
+                    let res = self.parse(&input[i + 1..])?;
+                    toks.push(PescToken::Macro(res.1));
+
+                    // move pointer past matching '}', or we
+                    // will exit prematurely (see next item)
+                    i += res.0 + 2;
+                },
+                '}' => return Ok((i, toks)),
+                '\n'
+                | ' ' => { i += 1; continue; },
+                'T' => {
+                    toks.push(PescToken::Bool(true));
+                    i += 1;
+                },
+                'F' => {
+                    toks.push(PescToken::Bool(false));
+                    i += 1;
+                },
+                _ => {
+                    if !self.ops.contains_key(&chs[i]) {
+                        return Err(PescError::new(None,
+                            PescErrorType::UnknownFunction(
+                                format!("'{}'", chs[i]))));
+                    } else {
+                        toks.push(PescToken::Symbol(chs[i]));
+                    }
+                    i += 1;
                 }
-            } else if chs[i] == '{' {
-                let res = self.parse(&input[i + 1..])?;
-                toks.push(PescToken::Macro(res.1));
-
-                // move pointer past matching '}', or we
-                // will exit prematurely (see next item)
-                i += res.0 + 2;
-            } else if chs[i] == '}' {
-                return Ok((i, toks));
-            } else if chs[i] == ' ' || chs[i] == '\n' {
-                i += 1;
-                continue;
-            } else if chs[i] == 'T' {
-                toks.push(PescToken::Bool(true));
-                i += 1;
-            } else if chs[i] == 'F' {
-                toks.push(PescToken::Bool(false));
-                i += 1;
-            } else {
-                if !self.ops.contains_key(&chs[i]) {
-                    return Err(PescError::new(None,
-                        PescErrorType::UnknownFunction(
-                            format!("'{}'", chs[i]))));
-                } else {
-                    toks.push(PescToken::Symbol(chs[i]));
-                }
-                i += 1;
             }
         }
 
