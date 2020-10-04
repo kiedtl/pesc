@@ -74,6 +74,11 @@ impl Pesc {
     pub fn try_exec(&mut self, tok: PescToken) -> Result<(), PescError> {
         match tok {
             PescToken::Func(func) => {
+                if !self.funcs.contains_key(&func) {
+                    return Err(PescError::new(None,
+                        PescErrorType::UnknownFunction(func)));
+                }
+
                 self.s_stack = self.m_stack.clone();
                 match (&self.funcs.clone()[&func])(self) {
                     Ok(()) => {
@@ -157,12 +162,7 @@ impl Pesc {
                     let s = chomp(&chs, i + 1, |c| c == ']');
                     i = s.1 + 1;
 
-                    if !self.funcs.contains_key(&s.0) {
-                        return Err(PescError::new(None,
-                            PescErrorType::UnknownFunction(s.0)));
-                    } else {
-                        toks.push(PescToken::Func(s.0));
-                    }
+                    toks.push(PescToken::Func(s.0));
                 },
 
                 // macros
@@ -275,4 +275,3 @@ impl Pesc {
         }
     }
 }
-
