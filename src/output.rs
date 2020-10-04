@@ -38,11 +38,18 @@ impl OutputMode {
                     let item_color = match i {
                         PescToken::Str(_) => TermStyle::Fg(TermColor::Cyan),
                         PescToken::Number(_) => TermStyle::BrightFg(TermColor::White),
+                        PescToken::Func(f) => {
+                            if p.funcs.contains_key(&f.clone()) {
+                                TermStyle::Fg(TermColor::White)
+                            } else {
+                                TermStyle::Fg(TermColor::Red)
+                            }
+                        },
                         PescToken::Bool(_) => TermStyle::Fg(TermColor::Yellow),
                         _ => TermStyle::Fg(TermColor::White),
                     };
 
-                    let fmt_item = format!("{g}[{r}{c}{item:>0$}{g}]{r}",
+                    let fmt_item = format!("{g}[{r}{c}{item:>0$}{r}{g}]{r}",
                         PADDING, c = item_color,
                         g = TermStyle::BrightFg(TermColor::Black),
                         r = TermStyle::Reset, item = i.to_string());
