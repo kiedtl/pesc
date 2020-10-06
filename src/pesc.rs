@@ -29,9 +29,7 @@ impl Display for PescToken {
 pub type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescErrorType>;
 
 pub struct Pesc {
-    pub m_stack: Vec<PescToken>,
-    pub s_stack: Vec<PescToken>,
-
+    pub stack: Vec<PescToken>,
     pub funcs: HashMap<String, Rc<Box<PescFunc>>>,
     pub ops: HashMap<char, String>,
 }
@@ -39,8 +37,7 @@ pub struct Pesc {
 impl Pesc {
     pub fn new() -> Self {
         Self {
-            m_stack: Vec::new(),
-            s_stack: Vec::new(),
+            stack: Vec::new(),
             funcs: HashMap::new(),
             ops: HashMap::new(),
         }
@@ -57,7 +54,7 @@ impl Pesc {
     }
 
     pub fn print(&self) {
-        self.m_stack.iter().rev().for_each(|i| println!("{} ", i));
+        self.stack.iter().rev().for_each(|i| println!("{} ", i));
     }
 
     pub fn eval(&mut self, code: &[PescToken]) -> Result<(), PescError> {
@@ -71,7 +68,7 @@ impl Pesc {
                                 Some(t.clone()), e)),
                     };
                 },
-                _ => self.m_stack.push(t.clone()),
+                _ => self.stack.push(t.clone()),
             }
         }
 
@@ -85,13 +82,13 @@ impl Pesc {
                     return Err(PescErrorType::UnknownFunction(func));
                 }
 
-                self.s_stack = self.m_stack.clone();
+                let backup = self.stack.clone();
                 match (&self.funcs.clone()[&func])(self) {
-                    Ok(()) => {
-                        self.m_stack = self.s_stack.clone();
-                        Ok(())
+                    Ok(()) => Ok(()),
+                    Err(e) => {
+                        self.stack = backup;
+                        Err(e)
                     },
-                    Err(e) => Err(e)
                 }
             },
             PescToken::Macro(mac) => match self.eval(&mac) {
@@ -223,28 +220,28 @@ impl Pesc {
     }
 
     pub fn nth_ref(&self, i: f64) -> Result<&PescToken, PescErrorType> {
-        match self.s_stack.iter().rev().nth(i as usize) {
+        match self.stack.iter().rev().nth(i as usize) {
             Some(value) => Ok(value),
-            None => Err(PescErrorType::OutOfBounds(i, self.s_stack.len())),
+            None => Err(PescErrorType::OutOfBounds(i, self.stack.len())),
         }
     }
 
     pub fn set(&mut self, i: f64, v: PescToken) -> Result<(), PescErrorType> {
-        let len = self.s_stack.len();
+        let len = self.stack.len();
         if len <= i as usize {
-            Err(PescErrorType::OutOfBounds(i, self.s_stack.len()))
+            Err(PescErrorType::OutOfBounds(i, self.stack.len()))
         } else {
-            self.s_stack[(len - 1) - (i as usize)] = v;
+            self.stack[(len - 1) - (i as usize)] = v;
             Ok(())
         }
     }
 
     pub fn push(&mut self, v: PescToken) {
-        self.s_stack.push(v)
+        self.stack.push(v)
     }
 
     pub fn pop(&mut self) -> Result<PescToken, PescErrorType> {
-        match self.s_stack.pop() {
+        match self.stack.pop() {
             Some(value) => Ok(value),
             None => Err(PescErrorType::NotEnoughArguments)
         }

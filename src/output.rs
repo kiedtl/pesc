@@ -23,7 +23,7 @@ impl OutputMode {
     pub fn format_stack(&self, p: &Pesc) {
         match self {
             OutputMode::Human => {
-                if p.m_stack.len() == 0 {
+                if p.stack.len() == 0 {
                     println!("(empty stack)");
                     return;
                 }
@@ -34,7 +34,7 @@ impl OutputMode {
                     TermStyle::BrightFg(TermColor::Black));
                 let mut ctr = 0;
 
-                for i in p.m_stack.iter().rev() {
+                for i in p.stack.iter().rev() {
                     let item_color = match i {
                         PescToken::Str(_) => TermStyle::Fg(TermColor::Cyan),
                         PescToken::Number(_) => TermStyle::BrightFg(TermColor::White),
