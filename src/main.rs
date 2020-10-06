@@ -5,6 +5,7 @@ mod stdlib;
 mod clihints;
 mod tty;
 mod output;
+mod serde;
 
 use crate::pesc::*;
 use crate::clihints::*;
