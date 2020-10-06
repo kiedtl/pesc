@@ -63,7 +63,7 @@ impl Pesc {
                 PescToken::Symbol(o) => {
                     let func = PescToken::Func(self.ops[o].clone());
                     match self.try_exec(func) {
-                        Ok(()) => return Ok(()),
+                        Ok(()) => (),
                         Err(e) => return Err(PescError::new(None,
                                 Some(t.clone()), e)),
                     };

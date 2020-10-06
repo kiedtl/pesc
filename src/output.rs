@@ -24,7 +24,9 @@ impl OutputMode {
         match self {
             OutputMode::Human => {
                 if p.stack.len() == 0 {
-                    println!("(empty stack)");
+                    println!("{g}(empty stack){r}",
+                    g = TermStyle::BrightFg(TermColor::Black),
+                    r = TermStyle::Reset);
                     return;
                 }
 
