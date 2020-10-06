@@ -23,8 +23,8 @@ pub enum PescErrorType {
     // <a>, <b>
     DivideByZero(f64, f64),
 
-    // <index>
-    OutOfBounds(f64),
+    // <index>, <length>
+    OutOfBounds(f64, usize),
 
     // <found>
     InvalidBoolean(PescToken),
@@ -47,7 +47,7 @@ impl ToString for PescErrorType {
                 format!("I don't know what to do with an empty literal."),
             PescErrorType::DivideByZero(a, b) =>
                 format!("You can't divide {} by {}, so don't try.", a, b),
-            PescErrorType::OutOfBounds(i) =>
+            PescErrorType::OutOfBounds(i, _) =>
                 format!("The stack isn't as big as you think ({} is out of bounds)", *i as usize),
             PescErrorType::InvalidBoolean(found) =>
                 format!("Uh, is {} supposed to be true or false?", found),
@@ -57,15 +57,45 @@ impl ToString for PescErrorType {
 
 #[derive(Clone, Debug)]
 pub struct PescError {
-    ch: Option<usize>,
-    kind: PescErrorType,
+    pub ch: Option<usize>,
+    pub token: Option<PescToken>,
+    pub kind: PescErrorType,
 }
 
 impl PescError {
-    pub fn new(c: Option<usize>, k: PescErrorType) -> Self {
+    pub fn new(c: Option<usize>, t: Option<PescToken>, k: PescErrorType)
+        -> Self
+    {
         Self {
             ch: c,
+            token: t,
             kind: k
+        }
+    }
+
+    fn hints(&self) -> Vec<String> {
+        match self.kind {
+            PescErrorType::UnknownFunction(_) => vec![
+                "is the function loaded correctly?".to_string(),
+            ],
+            PescErrorType::UnmatchedToken(_) => vec![],
+
+            // TODO: check function documentation and hint
+            // with the correct number of arguments
+            PescErrorType::NotEnoughArguments => vec![],
+            PescErrorType::InvalidArgumentType(_, _) => vec![],
+            PescErrorType::InvalidNumberLit(_) => vec![
+                "number literals may only contain character [0-9_\\.]".to_string(),
+                "bases other than decimal are currently not supported.".to_string(),
+            ],
+            PescErrorType::EmptyLiteral => vec![],
+            PescErrorType::DivideByZero(_, _) => vec![],
+            PescErrorType::OutOfBounds(_, a) => vec![
+                format!("the stack is {} elements long.", a),
+            ],
+            PescErrorType::InvalidBoolean(_) => vec![
+                "only tokens of type `number`, `string`, and `bool` can be cast as boolean.".to_string()
+            ],
         }
     }
 }

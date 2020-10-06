@@ -1,3 +1,4 @@
+mod args;
 mod errors;
 mod pesc;
 mod stdlib;
@@ -8,6 +9,7 @@ mod output;
 use crate::pesc::*;
 use crate::clihints::*;
 use crate::output::*;
+use crate::args::*;
 
 use rustyline::{
     config::{
@@ -19,6 +21,11 @@ use rustyline::{
 };
 
 fn main() {
+    let opts = match Options::new().parse() {
+        Ok(o) => o,
+        Err(()) => return,
+    };
+
     let mut pesc = Pesc::new();
     let output = OutputMode::auto();
 
@@ -26,21 +33,21 @@ fn main() {
         pesc.load(func.0, func.1, func.2);
     }
 
-    // waitaminute, let's see if there are args we
-    // can execute
-    let args = std::env::args().collect::<Vec<String>>();
-    if args.len() > 1 {
-        let parsed = match pesc.parse(&args[1]) {
+    // waitaminute, let's see if there is a file we
+    // need execute
+    if let Some(path) = opts.file {
+        let data = std::fs::read_to_string(path).unwrap();
+        let parsed = match pesc.parse(&data) {
             Ok(r) => r,
             Err(e) => {
-                println!("error: {}", e);
+                println!("pesc: error: {}", e);
                 return;
             },
         };
 
         match pesc.eval(&parsed.1) {
             Ok(()) => output.format_stack(&pesc),
-            Err(e) => println!("error: {}", e),
+            Err(e) => println!("pesc: error: {}", e),
         }
 
         return;

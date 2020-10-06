@@ -26,7 +26,7 @@ impl Display for PescToken {
     }
 }
 
-pub type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescError>;
+pub type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescErrorType>;
 
 pub struct Pesc {
     pub m_stack: Vec<PescToken>,
@@ -63,7 +63,14 @@ impl Pesc {
     pub fn eval(&mut self, code: &[PescToken]) -> Result<(), PescError> {
         for t in code {
             match t {
-                PescToken::Symbol(o) => self.try_exec(PescToken::Func(self.ops[o].clone()))?,
+                PescToken::Symbol(o) => {
+                    let func = PescToken::Func(self.ops[o].clone());
+                    match self.try_exec(func) {
+                        Ok(()) => return Ok(()),
+                        Err(e) => return Err(PescError::new(None,
+                                Some(t.clone()), e)),
+                    };
+                },
                 _ => self.m_stack.push(t.clone()),
             }
         }
@@ -71,12 +78,11 @@ impl Pesc {
         Ok(())
     }
 
-    pub fn try_exec(&mut self, tok: PescToken) -> Result<(), PescError> {
+    pub fn try_exec(&mut self, tok: PescToken) -> Result<(), PescErrorType> {
         match tok {
             PescToken::Func(func) => {
                 if !self.funcs.contains_key(&func) {
-                    return Err(PescError::new(None,
-                        PescErrorType::UnknownFunction(func)));
+                    return Err(PescErrorType::UnknownFunction(func));
                 }
 
                 self.s_stack = self.m_stack.clone();
@@ -88,10 +94,12 @@ impl Pesc {
                     Err(e) => Err(e)
                 }
             },
-            PescToken::Macro(mac) => self.eval(&mac),
-            _ => Err(PescError::new(None,
-                PescErrorType::InvalidArgumentType(
-                    String::from("macro/function"), tok.to_string())))
+            PescToken::Macro(mac) => match self.eval(&mac) {
+                Ok(()) => Ok(()),
+                Err(e) => Err(e.kind),
+            },
+            _ => Err(PescErrorType::InvalidArgumentType(
+                String::from("macro/function"), tok.to_string()))
         }
     }
 
@@ -130,7 +138,7 @@ impl Pesc {
 
                     let num = match n.0.replace("_", "").parse::<f64>() {
                         Ok(o) => o,
-                        Err(_) => return Err(PescError::new(Some(i),
+                        Err(_) => return Err(PescError::new(Some(i), None,
                             PescErrorType::InvalidNumberLit(n.0)))
                     };
 
@@ -143,7 +151,7 @@ impl Pesc {
 
                     let num = match n.0.replace("_", "").parse::<f64>() {
                         Ok(o) => o,
-                        Err(_) => return Err(PescError::new(Some(i),
+                        Err(_) => return Err(PescError::new(Some(i), None,
                             PescErrorType::InvalidNumberLit(n.0)))
                     };
 
@@ -200,7 +208,7 @@ impl Pesc {
                 // treat unknown characters as symbols aka operators
                 _ => {
                     if !self.ops.contains_key(&chs[i]) {
-                        return Err(PescError::new(None,
+                        return Err(PescError::new(Some(i), None,
                             PescErrorType::UnknownFunction(
                                 format!("'{}'", chs[i]))));
                     } else {
@@ -214,17 +222,17 @@ impl Pesc {
         Ok((i, toks))
     }
 
-    pub fn nth_ref(&self, i: f64) -> Result<&PescToken, PescError> {
+    pub fn nth_ref(&self, i: f64) -> Result<&PescToken, PescErrorType> {
         match self.s_stack.iter().rev().nth(i as usize) {
             Some(value) => Ok(value),
-            None => Err(PescError::new(None, PescErrorType::OutOfBounds(i))),
+            None => Err(PescErrorType::OutOfBounds(i, self.s_stack.len())),
         }
     }
 
-    pub fn set(&mut self, i: f64, v: PescToken) -> Result<(), PescError> {
+    pub fn set(&mut self, i: f64, v: PescToken) -> Result<(), PescErrorType> {
         let len = self.s_stack.len();
         if len <= i as usize {
-            Err(PescError::new(None, PescErrorType::OutOfBounds(i)))
+            Err(PescErrorType::OutOfBounds(i, self.s_stack.len()))
         } else {
             self.s_stack[(len - 1) - (i as usize)] = v;
             Ok(())
@@ -235,28 +243,25 @@ impl Pesc {
         self.s_stack.push(v)
     }
 
-    pub fn pop(&mut self) -> Result<PescToken, PescError> {
+    pub fn pop(&mut self) -> Result<PescToken, PescErrorType> {
         match self.s_stack.pop() {
             Some(value) => Ok(value),
-            None => Err(PescError::new(None,
-                    PescErrorType::NotEnoughArguments))
+            None => Err(PescErrorType::NotEnoughArguments)
         }
     }
 
-    pub fn pop_number(&mut self) -> Result<f64, PescError> {
+    pub fn pop_number(&mut self) -> Result<f64, PescErrorType> {
         let v = self.pop()?;
 
         if let PescToken::Number(n) = v {
             Ok(n)
         } else {
-            Err(PescError::new(None,
-                PescErrorType::InvalidArgumentType(
-                    String::from("number"),
-                    v.to_string())))
+            Err(PescErrorType::InvalidArgumentType(
+                String::from("number"), v.to_string()))
         }
     }
 
-    pub fn pop_boolean(&mut self) -> Result<bool, PescError> {
+    pub fn pop_boolean(&mut self) -> Result<bool, PescErrorType> {
         let v = self.pop()?;
         match v {
             PescToken::Str(s) => if s == String::from("") {
@@ -270,8 +275,7 @@ impl Pesc {
                 Ok(true)
             },
             PescToken::Bool(b) => Ok(b),
-            _ => Err(PescError::new(None,
-                    PescErrorType::InvalidBoolean(v)))
+            _ => Err(PescErrorType::InvalidBoolean(v))
         }
     }
 }

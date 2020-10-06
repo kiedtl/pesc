@@ -38,7 +38,7 @@ pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
 
 // --- math functions ---
 
-pub fn pesc_add(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_add(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
@@ -46,7 +46,7 @@ pub fn pesc_add(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_sub(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_sub(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
@@ -54,7 +54,7 @@ pub fn pesc_sub(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_mul(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_mul(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
@@ -62,19 +62,19 @@ pub fn pesc_mul(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_div(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_div(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
     if b == 0_f64 {
-        Err(PescError::new(None, PescErrorType::DivideByZero(a, b)))
+        Err(PescErrorType::DivideByZero(a, b))
     } else {
         p.push(PescToken::Number(a / b));
         Ok(())
     }
 }
 
-pub fn pesc_pow(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_pow(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
@@ -82,12 +82,12 @@ pub fn pesc_pow(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_mod(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_mod(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
     if b == 0_f64 {
-        Err(PescError::new(None, PescErrorType::DivideByZero(a, b)))
+        Err(PescErrorType::DivideByZero(a, b))
     } else {
         p.push(PescToken::Number(a % b));
         Ok(())
@@ -96,18 +96,18 @@ pub fn pesc_mod(p: &mut Pesc) -> Result<(), PescError> {
 
 // --- stack functions ---
 
-pub fn pesc_dup(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_dup(p: &mut Pesc) -> Result<(), PescErrorType> {
     let x = p.pop()?;
     p.push(x.clone()); p.push(x);
     Ok(())
 }
 
-pub fn pesc_pop(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_pop(p: &mut Pesc) -> Result<(), PescErrorType> {
     p.pop()?;
     Ok(())
 }
 
-pub fn pesc_swp(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_swp(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop()?;
     let b = p.pop()?;
 
@@ -115,7 +115,7 @@ pub fn pesc_swp(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_get(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_get(p: &mut Pesc) -> Result<(), PescErrorType> {
     // copy the nth item on the stack and dup
     let nth = p.pop_number()?;
     let x   = p.nth_ref(nth)?.clone();
@@ -124,7 +124,7 @@ pub fn pesc_get(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_rot(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_rot(p: &mut Pesc) -> Result<(), PescErrorType> {
     // swap the nth item on the stack with the first item
     let idx   = p.pop_number()?;
     let nth   = p.nth_ref(idx)?.clone();
@@ -137,13 +137,13 @@ pub fn pesc_rot(p: &mut Pesc) -> Result<(), PescError> {
 
 // --- boolean functions ---
 
-pub fn pesc_b_neg(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_b_neg(p: &mut Pesc) -> Result<(), PescErrorType> {
     let v = !p.pop_boolean()?;
     p.push(PescToken::Bool(v));
     Ok(())
 }
 
-pub fn pesc_b_and(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_b_and(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_boolean()?;
     let b = p.pop_boolean()?;
 
@@ -151,7 +151,7 @@ pub fn pesc_b_and(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_b_or(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_b_or(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_boolean()?;
     let b = p.pop_boolean()?;
 
@@ -159,7 +159,7 @@ pub fn pesc_b_or(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_b_eq(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_b_eq(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop()?;
     let b = p.pop()?;
 
@@ -167,7 +167,7 @@ pub fn pesc_b_eq(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_b_gt(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_b_gt(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
@@ -175,7 +175,7 @@ pub fn pesc_b_gt(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_b_lt(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_b_lt(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
     let b = p.pop_number()?;
 
@@ -183,7 +183,7 @@ pub fn pesc_b_lt(p: &mut Pesc) -> Result<(), PescError> {
     Ok(())
 }
 
-pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescErrorType> {
     let cond = p.pop_boolean()?;
     let main_branch = p.pop()?;
     let else_branch = p.pop()?;
@@ -198,7 +198,7 @@ pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescError> {
 
 // --- misc functions ---
 
-pub fn pesc_run(p: &mut Pesc) -> Result<(), PescError> {
+pub fn pesc_run(p: &mut Pesc) -> Result<(), PescErrorType> {
     let f = p.pop()?;
     p.try_exec(f)
 }
