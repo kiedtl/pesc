@@ -15,6 +15,7 @@ pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
         (Some('-'), "sub", func!(pesc_sub)),
         (Some('*'), "mul", func!(pesc_mul)),
         (Some('/'), "div", func!(pesc_div)),
+        (Some('÷'), "div", func!(pesc_div)),
         (Some('^'), "pow", func!(pesc_pow)),
         (Some('%'), "mod", func!(pesc_mod)),
 
