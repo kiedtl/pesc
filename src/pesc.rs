@@ -6,7 +6,7 @@ use crate::errors::*;
 #[derive(Clone, Debug, PartialEq)]
 pub enum PescToken {
     Str(String),
-    Number(f64),
+    Number(PescNumber),
     Func(String),
     Macro(Vec<PescToken>),
     Symbol(char),
@@ -26,6 +26,7 @@ impl Display for PescToken {
     }
 }
 
+pub type PescNumber = f64;
 pub type PescFunc = dyn Fn(&mut Pesc) -> Result<(), PescErrorType>;
 
 pub struct Pesc {
@@ -133,7 +134,7 @@ impl Pesc {
                     });
                     i = n.1;
 
-                    let num = match n.0.replace("_", "").parse::<f64>() {
+                    let num = match n.0.replace("_", "").parse::<PescNumber>() {
                         Ok(o) => o,
                         Err(_) => return Err(PescError::new(Some(i), None,
                             PescErrorType::InvalidNumberLit(n.0)))
@@ -146,7 +147,7 @@ impl Pesc {
                     let n = chomp(&chs, i + 1, |c| c == ')');
                     i = n.1 + 1;
 
-                    let num = match n.0.replace("_", "").parse::<f64>() {
+                    let num = match n.0.replace("_", "").parse::<PescNumber>() {
                         Ok(o) => o,
                         Err(_) => return Err(PescError::new(Some(i), None,
                             PescErrorType::InvalidNumberLit(n.0)))
@@ -219,14 +220,14 @@ impl Pesc {
         Ok((i, toks))
     }
 
-    pub fn nth_ref(&self, i: f64) -> Result<&PescToken, PescErrorType> {
+    pub fn nth_ref(&self, i: PescNumber) -> Result<&PescToken, PescErrorType> {
         match self.stack.iter().rev().nth(i as usize) {
             Some(value) => Ok(value),
             None => Err(PescErrorType::OutOfBounds(i, self.stack.len())),
         }
     }
 
-    pub fn set(&mut self, i: f64, v: PescToken) -> Result<(), PescErrorType> {
+    pub fn set(&mut self, i: PescNumber, v: PescToken) -> Result<(), PescErrorType> {
         let len = self.stack.len();
         if len <= i as usize {
             Err(PescErrorType::OutOfBounds(i, self.stack.len()))
@@ -247,7 +248,7 @@ impl Pesc {
         }
     }
 
-    pub fn pop_number(&mut self) -> Result<f64, PescErrorType> {
+    pub fn pop_number(&mut self) -> Result<PescNumber, PescErrorType> {
         let v = self.pop()?;
 
         if let PescToken::Number(n) = v {
@@ -266,7 +267,7 @@ impl Pesc {
             } else {
                 Ok(true)
             },
-            PescToken::Number(n) => if n == 0_f64 {
+            PescToken::Number(n) => if n == 0.0 {
                 Ok(false)
             } else {
                 Ok(true)
