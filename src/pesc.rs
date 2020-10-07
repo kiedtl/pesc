@@ -101,9 +101,9 @@ impl Pesc {
                     },
                 }
             },
-            PescToken::Macro(mac) => match self.exec(PescToken::Macro(mac)) {
+            PescToken::Macro(mac) => match self.eval(&mac) {
                 Ok(()) => Ok(()),
-                Err((b, e)) => Err((b, e)),
+                Err((b, e)) => Err((b, e.kind)),
             },
             _ => Err((self.stack.clone(), PescErrorType::InvalidArgumentType(
                 String::from("macro/function"), tok.to_string())))
