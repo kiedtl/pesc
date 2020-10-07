@@ -9,7 +9,7 @@ macro_rules! func {
     ($x:ident) => (Rc::new(Box::new($x)))
 }
 
-pub fn functions<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
+pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
         (Some('+'), "add", func!(pesc_add)),
         (Some('-'), "sub", func!(pesc_sub)),
@@ -202,4 +202,38 @@ pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescErrorType> {
 pub fn pesc_run(p: &mut Pesc) -> Result<(), PescErrorType> {
     let f = p.pop()?;
     p.try_exec(f)
+}
+
+// --- extended stdlib ---
+pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
+    vec![
+        (None, "lte", func!(pesc_ex_lte)),
+        (None, "gte", func!(pesc_ex_gte)),
+        (None, "def", func!(pesc_ex_def)),
+    ]
+}
+
+pub fn pesc_ex_lte(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    p.push(PescToken::Bool(a >= b));
+    Ok(())
+}
+
+pub fn pesc_ex_gte(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    p.push(PescToken::Bool(a <= b));
+    Ok(())
+}
+
+pub fn pesc_ex_def(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let name = p.pop_string()?;
+    let body = p.pop_macro()?;
+
+    p.funcs.insert(name, Rc::new(Box::new(move |p|
+                p.try_exec(PescToken::Macro(body.clone())))));
+    Ok(())
 }

@@ -30,7 +30,12 @@ fn main() {
     let mut pesc = Pesc::new();
     let output = OutputMode::auto();
 
-    for func in stdlib::functions() {
+    // load standard library
+    for func in stdlib::standard() {
+        pesc.load(func.0, func.1, func.2);
+    }
+
+    for func in stdlib::extended() {
         pesc.load(func.0, func.1, func.2);
     }
 

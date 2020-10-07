@@ -248,6 +248,8 @@ impl Pesc {
         }
     }
 
+    // TODO: merge pop_* into a single function (so we don't have all
+    // this duplicated code)
     pub fn pop_number(&mut self) -> Result<PescNumber, PescErrorType> {
         let v = self.pop()?;
 
@@ -256,6 +258,28 @@ impl Pesc {
         } else {
             Err(PescErrorType::InvalidArgumentType(
                 String::from("number"), v.to_string()))
+        }
+    }
+
+    pub fn pop_string(&mut self) -> Result<String, PescErrorType> {
+        let v = self.pop()?;
+
+        if let PescToken::Str(n) = v {
+            Ok(n)
+        } else {
+            Err(PescErrorType::InvalidArgumentType(
+                String::from("string"), v.to_string()))
+        }
+    }
+
+    pub fn pop_macro(&mut self) -> Result<Vec<PescToken>, PescErrorType> {
+        let v = self.pop()?;
+
+        if let PescToken::Macro(m) = v {
+            Ok(m)
+        } else {
+            Err(PescErrorType::InvalidArgumentType(
+                String::from("macro"), v.to_string()))
         }
     }
 
