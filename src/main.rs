@@ -52,8 +52,12 @@ fn main() {
         };
 
         match pesc.eval(&parsed.1) {
-            Ok(()) => output.format_stack(&pesc),
-            Err(e) => println!("pesc: error: {}", e),
+            Ok(()) => output.format_stack(&pesc.stack),
+            Err((b, e)) => {
+                println!("pesc: error: {}", e);
+                println!("pesc: problematic stack:");
+                output.format_stack(&b);
+            },
         }
 
         return;
@@ -83,15 +87,20 @@ fn main() {
 
                 match pesc.eval(&parsed.1) {
                     Ok(()) => (),
-                    Err(e) => println!("error: {}", e),
+                    Err((b, e)) => {
+                        println!("error: {}", e);
+                        println!("problematic stack:");
+                        output.format_stack(&b);
+                        println!("\n\n");
+                    },
                 }
 
-                output.format_stack(&pesc);
+                output.format_stack(&pesc.stack);
             },
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) =>
                 println!("Use Ctrl-D to quit."),
-            Err(_) => output.format_stack(&pesc),
+            Err(_) => output.format_stack(&pesc.stack),
         }
     }
 }

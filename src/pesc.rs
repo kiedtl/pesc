@@ -16,7 +16,7 @@ pub enum PescToken {
 impl Display for PescToken {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
-            PescToken::Macro(m) => write!(f, "<mac {:?}>", m),
+            PescToken::Macro(m) => write!(f, "<mac {:p}>", m),
             PescToken::Symbol(y) => write!(f, "<sym '{}'>", y),
             PescToken::Str(s) => write!(f, "{:?}", s),
             PescToken::Number(n) => write!(f, "{}", n),
@@ -54,19 +54,17 @@ impl Pesc {
         self.funcs.insert(String::from(fnname), func);
     }
 
-    pub fn print(&self) {
-        self.stack.iter().rev().for_each(|i| println!("{} ", i));
-    }
-
-    pub fn eval(&mut self, code: &[PescToken]) -> Result<(), PescError> {
+    pub fn eval(&mut self, code: &[PescToken])
+        -> Result<(), (Vec<PescToken>, PescError)>
+    {
         for t in code {
             match t {
                 PescToken::Symbol(o) => {
                     let func = PescToken::Func(self.ops[o].clone());
-                    match self.try_exec(func) {
+                    match self.exec(func) {
                         Ok(()) => (),
-                        Err(e) => return Err(PescError::new(None,
-                                Some(t.clone()), e)),
+                        Err((b, e)) => return Err((b,
+                            PescError::new(None, Some(t.clone()), e))),
                     };
                 },
                 _ => self.stack.push(t.clone()),
@@ -77,27 +75,38 @@ impl Pesc {
     }
 
     pub fn try_exec(&mut self, tok: PescToken) -> Result<(), PescErrorType> {
+        match self.exec(tok) {
+            Ok(()) => Ok(()),
+            Err((b, e)) => Err(e),
+        }
+    }
+
+    fn exec(&mut self, tok: PescToken)
+        -> Result<(), (Vec<PescToken>, PescErrorType)>
+    {
         match tok {
             PescToken::Func(func) => {
                 if !self.funcs.contains_key(&func) {
-                    return Err(PescErrorType::UnknownFunction(func));
+                    return Err((self.stack.clone(),
+                        PescErrorType::UnknownFunction(func)));
                 }
 
                 let backup = self.stack.clone();
                 match (&self.funcs.clone()[&func])(self) {
                     Ok(()) => Ok(()),
                     Err(e) => {
+                        let badstack = self.stack.clone();
                         self.stack = backup;
-                        Err(e)
+                        Err((badstack, e))
                     },
                 }
             },
-            PescToken::Macro(mac) => match self.eval(&mac) {
+            PescToken::Macro(mac) => match self.exec(PescToken::Macro(mac)) {
                 Ok(()) => Ok(()),
-                Err(e) => Err(e.kind),
+                Err((b, e)) => Err((b, e)),
             },
-            _ => Err(PescErrorType::InvalidArgumentType(
-                String::from("macro/function"), tok.to_string()))
+            _ => Err((self.stack.clone(), PescErrorType::InvalidArgumentType(
+                String::from("macro/function"), tok.to_string())))
         }
     }
 

@@ -20,10 +20,10 @@ impl OutputMode {
         }
     }
 
-    pub fn format_stack(&self, p: &Pesc) {
+    pub fn format_stack(&self, stack: &Vec<PescToken>) {
         match self {
             OutputMode::Human => {
-                if p.stack.len() == 0 {
+                if stack.len() == 0 {
                     println!("{g}(empty stack){r}",
                     g = TermStyle::BrightFg(TermColor::Black),
                     r = TermStyle::Reset);
@@ -36,17 +36,11 @@ impl OutputMode {
                     TermStyle::BrightFg(TermColor::Black));
                 let mut ctr = 0;
 
-                for i in p.stack.iter().rev() {
+                for i in stack.iter().rev() {
                     let item_color = match i {
                         PescToken::Str(_) => TermStyle::Fg(TermColor::Cyan),
                         PescToken::Number(_) => TermStyle::BrightFg(TermColor::White),
-                        PescToken::Func(f) => {
-                            if p.funcs.contains_key(&f.clone()) {
-                                TermStyle::Fg(TermColor::White)
-                            } else {
-                                TermStyle::Fg(TermColor::Red)
-                            }
-                        },
+                        PescToken::Func(f) => TermStyle::Underline,
                         PescToken::Bool(_) => TermStyle::Fg(TermColor::Yellow),
                         _ => TermStyle::Fg(TermColor::White),
                     };
@@ -73,7 +67,9 @@ impl OutputMode {
             },
             OutputMode::Machine => unimplemented!(),
             OutputMode::Simple
-            | OutputMode::Quiet => p.print(),
+            | OutputMode::Quiet => stack.iter()
+                    .rev()
+                    .for_each(|i| println!("{} ", i)),
         }
     }
 }
