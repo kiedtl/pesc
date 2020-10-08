@@ -6,6 +6,8 @@ mod clihints;
 mod tty;
 mod output;
 mod serde;
+mod rand;
+mod utils;
 
 use crate::pesc::*;
 use crate::clihints::*;

@@ -28,6 +28,8 @@ pub enum PescErrorType {
 
     // <found>
     InvalidBoolean(PescToken),
+
+    Other(String),
 }
 
 impl ToString for PescErrorType {
@@ -51,6 +53,7 @@ impl ToString for PescErrorType {
                 format!("The stack isn't as big as you think ({} is out of bounds)", *i as usize),
             PescErrorType::InvalidBoolean(found) =>
                 format!("Uh, is {} supposed to be true or false?", found),
+            PescErrorType::Other(msg) => msg.clone(),
         }
     }
 }
@@ -96,6 +99,7 @@ impl PescError {
             PescErrorType::InvalidBoolean(_) => vec![
                 "only tokens of type `number`, `string`, and `bool` can be cast as boolean.".to_string()
             ],
+            PescErrorType::Other(_) => vec![],
         }
     }
 }

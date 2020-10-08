@@ -2,12 +2,19 @@ use std::rc::Rc;
 use std::vec::Vec;
 use crate::errors::*;
 use crate::pesc::*;
+use crate::utils::*;
+use std::ops::*;
+use crate::rand;
+
+const PESC_EX_E_ITERS: usize = 64;
 
 // --- helper functions ---
 
 macro_rules! func {
     ($x:ident) => (Rc::new(Box::new($x)))
 }
+
+// --- declaration ---
 
 pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
@@ -34,6 +41,26 @@ pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
         (Some('?'), "if?", func!(pesc_b_cond)),
 
         (Some(';'), "run", func!(pesc_run)),
+    ]
+}
+
+pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
+    // TODO: operators
+    vec![
+        (None, "lte",  func!(pesc_ex_lte)),
+        (None, "gte",  func!(pesc_ex_gte)),
+        (None, "def",  func!(pesc_ex_def)),
+        (None, "size", func!(pesc_ex_size)),
+        (None, "rand", func!(pesc_ex_rand)),
+        (None, "torn", func!(pesc_ex_torn)),
+        (None, "frrn", func!(pesc_ex_frrn)),
+        (None, "gcd",  func!(pesc_ex_gcd)),
+        (None, "ack",  func!(pesc_ex_ack)),
+
+        (None, "odd",  func!(pesc_ex_odd)),
+        (None, "even",  func!(pesc_ex_even)),
+        (None, "coprime",  func!(pesc_ex_coprime)),
+        (None, "prime",  func!(pesc_ex_prime)),
     ]
 }
 
@@ -205,13 +232,6 @@ pub fn pesc_run(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 // --- extended stdlib ---
-pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
-    vec![
-        (None, "lte", func!(pesc_ex_lte)),
-        (None, "gte", func!(pesc_ex_gte)),
-        (None, "def", func!(pesc_ex_def)),
-    ]
-}
 
 pub fn pesc_ex_lte(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
@@ -235,5 +255,320 @@ pub fn pesc_ex_def(p: &mut Pesc) -> Result<(), PescErrorType> {
 
     p.funcs.insert(name, Rc::new(Box::new(move |p|
                 p.try_exec(PescToken::Macro(body.clone())))));
+    Ok(())
+}
+
+pub fn pesc_ex_size(p: &mut Pesc) -> Result<(), PescErrorType> {
+    p.push(PescToken::Number(p.stack.len() as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_rand(p: &mut Pesc) -> Result<(), PescErrorType> {
+    // TODO: random decimal, no first zero
+    let r = unsafe { rand::lrand48() } as f64;
+    p.push(PescToken::Number(r));
+    Ok(())
+}
+
+pub fn pesc_ex_band(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()? as usize;
+    let b = p.pop_number()? as usize;
+
+    p.push(PescToken::Number((a & b) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_bor(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()? as usize;
+    let b = p.pop_number()? as usize;
+
+    p.push(PescToken::Number((a | b) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_bxor(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()? as usize;
+    let b = p.pop_number()? as usize;
+
+    p.push(PescToken::Number((a ^ b) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_bshiftr(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()? as usize;
+    let b = p.pop_number()? as usize;
+
+    p.push(PescToken::Number((a >> b) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_bshiftl(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()? as usize;
+    let b = p.pop_number()? as usize;
+
+    p.push(PescToken::Number((a << b) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_sin(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+
+    p.push(PescToken::Number(a.sin()));
+    Ok(())
+}
+
+pub fn pesc_ex_cos(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+
+    p.push(PescToken::Number(a.cos()));
+    Ok(())
+}
+
+pub fn pesc_ex_tan(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+
+    p.push(PescToken::Number(a.tan()));
+    Ok(())
+}
+
+pub fn pesc_ex_sec(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+
+    p.push(PescToken::Number(1_f64 / a.cos()));
+    Ok(())
+}
+
+pub fn pesc_ex_csc(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+
+    p.push(PescToken::Number(1_f64 / a.sin()));
+    Ok(())
+}
+
+pub fn pesc_ex_cot(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+
+    p.push(PescToken::Number(1_f64 / a.tan()));
+    Ok(())
+}
+
+pub fn pesc_ex_atan(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+
+    p.push(PescToken::Number(a.atan()));
+    Ok(())
+}
+
+pub fn pesc_ex_log(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    p.push(PescToken::Number(a.log(b)));
+    Ok(())
+}
+
+pub fn pesc_ex_pi(p: &mut Pesc) -> Result<(), PescErrorType> {
+    // machin formula
+    // pi = (4 * arctangent(1/5) - arctangent(1/239)) * 4
+
+    let pi = (4_f64 * (1_f64/5_f64).atan()
+        - (1_f64/239_f64).atan()) * 4_f64;
+    p.push(PescToken::Number(pi));
+    Ok(())
+}
+
+pub fn pesc_ex_e(p: &mut Pesc) -> Result<(), PescErrorType> {
+    //         inf
+    //         ___  1
+    // e = 1 + \   ───
+    //         /__ +n!
+    //         n=0
+
+    #[inline]
+    fn calc_e(iters: usize, accm: f64) -> f64 {
+        match iters {
+            0 => accm,
+            _ => {
+                let naccm = 1_f64 / factorial(iters) as f64;
+                calc_e(iters - 1, accm + naccm)
+            }
+        }
+    }
+
+    let e = 1_f64 + calc_e(PESC_EX_E_ITERS, 0_f64);
+
+    p.push(PescToken::Number(e));
+    Ok(())
+}
+
+pub fn pesc_ex_min(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    p.push(PescToken::Number(if a < b { a } else { b }));
+    Ok(())
+}
+
+pub fn pesc_ex_max(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()?;
+    let b = p.pop_number()?;
+
+    p.push(PescToken::Number(if a > b { a } else { b }));
+    Ok(())
+}
+
+pub fn pesc_ex_clamp(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let val = p.pop_number()?;
+    let min = p.pop_number()?;
+    let max = p.pop_number()?;
+
+    let res = match () {
+        _ if val < min => min,
+        _ if val > max => max,
+        _ => val,
+    };
+
+    p.push(PescToken::Number(res));
+    Ok(())
+}
+
+pub fn pesc_ex_sqrt(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()?;
+
+    p.push(PescToken::Number(v.sqrt()));
+    Ok(())
+}
+
+pub fn pesc_ex_cbrt(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()?;
+
+    p.push(PescToken::Number(v.cbrt()));
+    Ok(())
+}
+
+pub fn pesc_ex_fact(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()? as usize;
+
+    p.push(PescToken::Number(factorial(v) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_ceil(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()?;
+
+    p.push(PescToken::Number(v.ceil()));
+    Ok(())
+}
+
+pub fn pesc_ex_floor(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()?;
+
+    p.push(PescToken::Number(v.floor()));
+    Ok(())
+}
+
+pub fn pesc_ex_round(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()?;
+
+    p.push(PescToken::Number(v.round()));
+    Ok(())
+}
+
+pub fn pesc_ex_torn(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let mut v = p.pop_number()?.round() as usize;
+
+    let bufsz = 2048 + 6;
+    let mut buf: Vec<char> = Vec::new();
+
+    while v != 0 {
+        match () {
+            _ if v >= 1000 => { v -= 1000; buf.push('M') },
+            _ if v >=  500 => { v -=  500; buf.push('D') },
+            _ if v >=  100 => { v -=  100; buf.push('C') },
+            _ if v >=   50 => { v -=   50; buf.push('L') },
+            _ if v >=   10 => { v -=   10; buf.push('X') },
+            _ if v >=    5 => { v -=    5; buf.push('V') },
+            _ if v >=    1 => { v -=    1; buf.push('I') },
+            _ => (),
+        }
+    }
+
+    p.push(PescToken::Str(buf.iter().collect::<String>()));
+    Ok(())
+}
+
+pub fn pesc_ex_frrn(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_string()?;
+
+    let mut ctr = 0;
+    let chs = v.chars().collect::<Vec<char>>();
+    let mut buf = 0;
+
+    while ctr < chs.len() {
+        buf += rom_num_value(chs[ctr])?;
+        ctr += 1;
+    }
+
+    p.push(PescToken::Number(buf as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_gcd(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let u = p.pop_number()? as usize;
+    let v = p.pop_number()? as usize;
+
+    p.push(PescToken::Number(gcd(u, v) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_lcm(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let a = p.pop_number()? as usize;
+    let b = p.pop_number()? as usize;
+
+    p.push(PescToken::Number(lcm(a, b) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_ack(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let m = p.pop_number()? as usize;
+    let n = p.pop_number()? as usize;
+
+    p.push(PescToken::Number(ackermann(m, n) as f64));
+    Ok(())
+}
+
+pub fn pesc_ex_odd(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()? as usize;
+
+    p.push(PescToken::Bool(v & 1 == 1));
+    Ok(())
+}
+
+pub fn pesc_ex_even(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()? as usize;
+
+    p.push(PescToken::Bool(v & 1 == 0));
+    Ok(())
+}
+
+pub fn pesc_ex_abs(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let v = p.pop_number()?;
+
+    p.push(PescToken::Number(v.abs()));
+    Ok(())
+}
+
+pub fn pesc_ex_coprime(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let u = p.pop_number()? as usize;
+    let v = p.pop_number()? as usize;
+
+    p.push(PescToken::Bool(gcd(u, v) == 1));
+    Ok(())
+}
+
+pub fn pesc_ex_prime(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let x = p.pop_number()? as usize;
+
+    p.push(PescToken::Bool(is_prime(x)));
     Ok(())
 }
