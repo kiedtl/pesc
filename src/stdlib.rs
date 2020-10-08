@@ -10,7 +10,7 @@ const PESC_EX_E_ITERS: usize = 64;
 
 // --- helper functions ---
 
-macro_rules! func {
+macro_rules! rc_box {
     ($x:ident) => (Rc::new(Box::new($x)))
 }
 
@@ -18,49 +18,83 @@ macro_rules! func {
 
 pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
-        (Some('+'), "add", func!(pesc_add)),
-        (Some('-'), "sub", func!(pesc_sub)),
-        (Some('*'), "mul", func!(pesc_mul)),
-        (Some('/'), "div", func!(pesc_div)),
-        (Some('÷'), "div", func!(pesc_div)),
-        (Some('^'), "pow", func!(pesc_pow)),
-        (Some('%'), "mod", func!(pesc_mod)),
+        (Some('+'), "add", rc_box!(pesc_add)),
+        (Some('-'), "sub", rc_box!(pesc_sub)),
+        (Some('*'), "mul", rc_box!(pesc_mul)),
+        (Some('/'), "div", rc_box!(pesc_div)),
+        (Some('÷'), "div", rc_box!(pesc_div)),
+        (Some('^'), "pow", rc_box!(pesc_pow)),
+        (Some('%'), "mod", rc_box!(pesc_mod)),
 
-        (Some('#'), "dup", func!(pesc_dup)),
-        (Some('$'), "pop", func!(pesc_pop)),
-        (Some(','), "swp", func!(pesc_swp)),
-        (Some('ø'), "get", func!(pesc_get)),
-        (Some('@'), "rot", func!(pesc_rot)),
+        (Some('#'), "dup", rc_box!(pesc_dup)),
+        (Some('$'), "pop", rc_box!(pesc_pop)),
+        (Some(','), "swp", rc_box!(pesc_swp)),
+        (Some('ø'), "get", rc_box!(pesc_get)),
+        (Some('@'), "rot", rc_box!(pesc_rot)),
 
-        (Some('!'), "neg", func!(pesc_b_neg)),
-        (Some('&'), "and", func!(pesc_b_and)),
-        (Some('|'), "or",  func!(pesc_b_or)),
-        (Some('='), "eq?", func!(pesc_b_eq)),
-        (Some('<'), "gt?", func!(pesc_b_gt)),
-        (Some('>'), "lt?", func!(pesc_b_lt)),
-        (Some('?'), "if?", func!(pesc_b_cond)),
+        (Some('!'), "neg", rc_box!(pesc_b_neg)),
+        (Some('&'), "and", rc_box!(pesc_b_and)),
+        (Some('|'), "or",  rc_box!(pesc_b_or)),
+        (Some('='), "eq?", rc_box!(pesc_b_eq)),
+        (Some('<'), "gt?", rc_box!(pesc_b_gt)),
+        (Some('>'), "lt?", rc_box!(pesc_b_lt)),
+        (Some('?'), "if?", rc_box!(pesc_b_cond)),
 
-        (Some(';'), "run", func!(pesc_run)),
+        (Some(';'), "run", rc_box!(pesc_run)),
     ]
 }
 
 pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     // TODO: operators
     vec![
-        (None, "lte",  func!(pesc_ex_lte)),
-        (None, "gte",  func!(pesc_ex_gte)),
-        (None, "def",  func!(pesc_ex_def)),
-        (None, "size", func!(pesc_ex_size)),
-        (None, "rand", func!(pesc_ex_rand)),
-        (None, "torn", func!(pesc_ex_torn)),
-        (None, "frrn", func!(pesc_ex_frrn)),
-        (None, "gcd",  func!(pesc_ex_gcd)),
-        (None, "ack",  func!(pesc_ex_ack)),
+        (None, "lte",     rc_box!(pesc_ex_lte)),
+        (None, "gte",     rc_box!(pesc_ex_gte)),
+        (None, "def",     rc_box!(pesc_ex_def)),
+        (None, "size",    rc_box!(pesc_ex_size)),
+        (None, "rand",    rc_box!(pesc_ex_rand)),
 
-        (None, "odd",  func!(pesc_ex_odd)),
-        (None, "even",  func!(pesc_ex_even)),
-        (None, "coprime",  func!(pesc_ex_coprime)),
-        (None, "prime",  func!(pesc_ex_prime)),
+        (None, "band",    rc_box!(pesc_ex_band)),
+        (None, "bor",     rc_box!(pesc_ex_bor)),
+        (None, "bxor",    rc_box!(pesc_ex_bxor)),
+        (None, "shl",     rc_box!(pesc_ex_bshiftl)),
+        (None, "shr",     rc_box!(pesc_ex_bshiftr)),
+
+        (None, "sin",     rc_box!(pesc_ex_sin)),
+        (None, "cos",     rc_box!(pesc_ex_cos)),
+        (None, "tan",     rc_box!(pesc_ex_tan)),
+        (None, "csc",     rc_box!(pesc_ex_csc)),
+        (None, "sec",     rc_box!(pesc_ex_sec)),
+        (None, "cot",     rc_box!(pesc_ex_cot)),
+        (None, "atan",    rc_box!(pesc_ex_atan)),
+
+        (None, "log",     rc_box!(pesc_ex_log)),
+        (None, "sqrt",    rc_box!(pesc_ex_sqrt)),
+        (None, "cbrt",    rc_box!(pesc_ex_cbrt)),
+        (None, "fact",    rc_box!(pesc_ex_fact)),
+        (None, "ack",     rc_box!(pesc_ex_ack)),
+        (None, "abs",     rc_box!(pesc_ex_abs)),
+        (None, "lcm",     rc_box!(pesc_ex_lcm)),
+        (None, "gcd",     rc_box!(pesc_ex_gcd)),
+
+        (None, "pi",      rc_box!(pesc_ex_pi)),
+        (None, "e",       rc_box!(pesc_ex_e)),
+
+        (None, "min",     rc_box!(pesc_ex_min)),
+        (None, "max",     rc_box!(pesc_ex_max)),
+        (None, "clamp",   rc_box!(pesc_ex_clamp)),
+
+        (None, "floor",   rc_box!(pesc_ex_floor)),
+        (None, "ceil",    rc_box!(pesc_ex_ceil)),
+        (None, "round",   rc_box!(pesc_ex_round)),
+
+        (None, "frrn",    rc_box!(pesc_ex_frrn)),
+        (None, "torn",    rc_box!(pesc_ex_torn)),
+
+        (None, "odd",     rc_box!(pesc_ex_odd)),
+        (None, "even",    rc_box!(pesc_ex_even)),
+
+        (None, "coprime", rc_box!(pesc_ex_coprime)),
+        (None, "prime",   rc_box!(pesc_ex_prime)),
     ]
 }
 
