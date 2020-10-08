@@ -98,7 +98,8 @@ impl Pesc {
         -> Result<(), (Vec<PescToken>, PescErrorType)>
     {
         match tok {
-            PescToken::Func(func) => {
+            PescToken::Func(_func) => {
+                let func = _func.to_lowercase();
                 if !self.funcs.contains_key(&func) {
                     return Err((self.stack.clone(),
                         PescErrorType::UnknownFunction(func)));
