@@ -45,7 +45,7 @@ fn main() {
     // need execute
     if let Some(path) = opts.file {
         let data = std::fs::read_to_string(path).unwrap();
-        let parsed = match pesc.parse(&data) {
+        let parsed = match Pesc::parse(&data) {
             Ok(r) => r,
             Err(e) => {
                 println!("pesc: error: {}", e);
@@ -79,7 +79,7 @@ fn main() {
     loop {
         match rl.readline("pesc> ") {
             Ok(line) => {
-                let parsed = match pesc.parse(&line) {
+                let parsed = match Pesc::parse(&line) {
                     Ok(r) => r,
                     Err(e) => {
                         println!("error: {}", e);

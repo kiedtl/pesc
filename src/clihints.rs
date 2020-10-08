@@ -1,17 +1,28 @@
 // the following code was proudly stolen
-// from the `diy_hint` example in rustyline's source.
+// from the examples in rustyline's source.
+//
+// TODO: choose a more accurate name for this module
 
 use std::collections::HashSet;
 use crate::pesc::Pesc;
+use crate::errors::*;
+
+use rustyline::error::ReadlineError;
 use rustyline::{
-    hint::Hinter, Context
+    hint::Hinter, Context, Editor,
+    validate::{
+        ValidationContext, Validator,
+        ValidationResult::{
+            self, Incomplete, Invalid, Valid
+        },
+    },
 };
 use rustyline_derive::{
     Completer, Helper,
     Highlighter, Validator
 };
 
-#[derive(Completer, Helper, Validator, Highlighter)]
+#[derive(Completer, Helper, Highlighter)]
 pub struct CommandHinter {
     // TODO: use ** radix trie **
     hints: HashSet<String>,
@@ -20,6 +31,25 @@ pub struct CommandHinter {
 impl CommandHinter {
     pub fn new(hints: HashSet<String>) -> Self {
         Self { hints: hints }
+    }
+}
+
+impl Validator for CommandHinter {
+    fn validate(&self, ctx: &mut ValidationContext)
+        -> Result<ValidationResult, ReadlineError>
+    {
+        let input = ctx.input();
+
+        match Pesc::parse(&input) {
+            Ok(_) => Ok(Valid(None)),
+            Err(e) => {
+                if let PescErrorType::UnmatchedToken(_) = e.kind {
+                    Ok(Incomplete)
+                } else {
+                    Ok(Valid(None))
+                }
+            },
+        }
     }
 }
 

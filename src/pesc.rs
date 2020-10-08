@@ -3,6 +3,9 @@ use std::fmt::{self, Display};
 use std::collections::HashMap;
 use crate::errors::*;
 
+const BOOLEAN_TRUE:  char = 'T';
+const BOOLEAN_FALSE: char = 'F';
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum PescToken {
     Str(String),
@@ -50,6 +53,9 @@ impl Pesc {
         if let Some(o) = op {
             assert!(!self.ops.contains_key(&o),
                 "cannot add operator {:?}: already added", op);
+            assert!(o != BOOLEAN_TRUE && o != BOOLEAN_FALSE,
+                "cannot add operator {:?}: reserved keyword", op);
+
             self.ops.insert(o, String::from(fnname));
         }
 
@@ -124,27 +130,48 @@ impl Pesc {
         }
     }
 
-    pub fn parse(&self, input: &str)
-        -> Result<(usize, Vec<PescToken>), PescError>
-    {
+    // TODO: cleanup, remove duplicated code
+    // here be atrocious code
+    pub fn parse(input: &str) -> Result<(usize, Vec<PescToken>), PescError> {
         let mut toks = Vec::new();
 
         let chs = input.chars()
             .collect::<Vec<char>>();
         let mut i = 0;
 
-        fn chomp<F>(ch: &[char], mut c: usize, until: F) -> (String, usize)
+        // chomp the chars, placing them in a buffer.
+        // return (String, usize, bool) when until() -> true or
+        // when it reaches the end of the chars
+        //
+        //     String = the buffer,
+        //     usize  = the end index,
+        //     bool   = did we reach the end of the data
+        //              without having until() return true?
+        //
+        fn chomp<F>(ch: &[char], mut c: usize, until: F)
+            -> (String, usize, bool)
         where
             F: Fn(char) -> bool
         {
             let mut buf = String::new();
+            let early_return;
 
-            while c < ch.len() && until(ch[c]) == false {
+            loop {
+                if c >= ch.len() {
+                    early_return = true;
+                    break;
+                }
+
+                if until(ch[c]) == true {
+                    early_return = false;
+                    break;
+                }
+
                 buf += &format!("{}", ch[c]);
                 c += 1;
             }
 
-            (buf, c)
+            (buf, c, early_return)
         }
 
         while i < chs.len() {
@@ -178,6 +205,13 @@ impl Pesc {
                     let n = chomp(&chs, i + 1, |c| c == ')');
                     i = n.1 + 1;
 
+                    if n.2 {
+                        // we hit the end of the data
+                        // without finding a matching bracket
+                        return Err(PescError::new(Some(i), None,
+                            PescErrorType::UnmatchedToken('(')));
+                    }
+
                     if n.0.len() == 0 {
                         return Err(PescError::new(Some(i), None,
                             PescErrorType::EmptyLiteral));
@@ -203,6 +237,14 @@ impl Pesc {
                 '"' => {
                     let s = chomp(&chs, i + 1, |c| c == '"');
                     i = s.1 + 1;
+
+                    if s.2 {
+                        // we hit the end of the data
+                        // without finding a matching quote
+                        return Err(PescError::new(Some(i), None,
+                            PescErrorType::UnmatchedToken('"')));
+                    }
+
                     toks.push(PescToken::Str(s.0));
                 },
 
@@ -211,20 +253,32 @@ impl Pesc {
                     let s = chomp(&chs, i + 1, |c| c == ']');
                     i = s.1 + 1;
 
+                    if s.2 {
+                        // we hit the end of the data
+                        // without finding a matching bracket
+                        return Err(PescError::new(Some(i), None,
+                            PescErrorType::UnmatchedToken('[')));
+                    }
+
                     toks.push(PescToken::Func(s.0));
                 },
 
                 // macros
                 '{' => {
-                    let res = self.parse(&input[i + 1..])?;
+                    let m = chomp(&chs, i + 1, |c| c == '}');
+
+                    if m.2 {
+                        // we hit the end of the data
+                        // without finding a matching bracket
+                        return Err(PescError::new(Some(i), None,
+                            PescErrorType::UnmatchedToken('{')));
+                    }
+
+                    i += m.1 + 1;
+
+                    let res = Pesc::parse(&m.0)?;
                     toks.push(PescToken::Macro(res.1));
-
-                    // move pointer past matching '}', or we
-                    // will exit prematurely (see next item)
-                    i += res.0 + 2;
                 },
-
-                '}' => return Ok((i, toks)),
 
                 // whitespace
                 '\n'
@@ -236,25 +290,19 @@ impl Pesc {
                     i = chomp(&chs, i + 1, |c| c == '\n' || c == '\\').1 + 1,
 
                 // boolean values
-                'T' => {
+                BOOLEAN_TRUE => {
                     toks.push(PescToken::Bool(true));
                     i += 1;
                 },
 
-                'F' => {
+                BOOLEAN_FALSE => {
                     toks.push(PescToken::Bool(false));
                     i += 1;
                 },
 
                 // treat unknown characters as symbols aka operators
                 _ => {
-                    if !self.ops.contains_key(&chs[i]) {
-                        return Err(PescError::new(Some(i), None,
-                            PescErrorType::UnknownFunction(
-                                format!("'{}'", chs[i]))));
-                    } else {
-                        toks.push(PescToken::Symbol(chs[i]));
-                    }
+                    toks.push(PescToken::Symbol(chs[i]));
                     i += 1;
                 }
             }
