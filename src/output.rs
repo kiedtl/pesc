@@ -40,7 +40,7 @@ impl OutputMode {
                     let item_color = match i {
                         PescToken::Str(_) => TermStyle::Fg(TermColor::Cyan),
                         PescToken::Number(_) => TermStyle::BrightFg(TermColor::White),
-                        PescToken::Func(f) => TermStyle::Underline,
+                        PescToken::Macro(_) => TermStyle::Underline,
                         PescToken::Bool(_) => TermStyle::Fg(TermColor::Yellow),
                         _ => TermStyle::Fg(TermColor::White),
                     };
