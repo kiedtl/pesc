@@ -48,10 +48,16 @@ impl Pesc {
         func: Rc<Box<PescFunc>>)
     {
         if let Some(o) = op {
+            assert!(!self.ops.contains_key(&o),
+                "cannot add operator {:?}: already added", op);
             self.ops.insert(o, String::from(fnname));
         }
 
-        self.funcs.insert(String::from(fnname), func);
+        let s_fnname = String::from(fnname);
+
+        if !self.funcs.contains_key(&s_fnname) {
+            self.funcs.insert(s_fnname, func);
+        }
     }
 
     pub fn eval(&mut self, code: &[PescToken])
@@ -145,23 +151,43 @@ impl Pesc {
                 // integer literals
                 _ if chs[i].is_numeric() || chs[i] == '.'
                                          || chs[i] == '_' => {
+                    let mut sign = 1_f64;
+
                     let n = chomp(&chs, i, |c| {
                         !c.is_digit(10) && c != '_' && c != '.'
                     });
                     i = n.1;
 
+                    if n.0.chars().nth(0).unwrap() == '_' {
+                        sign = -1_f64;
+                    }
+
                     let num = match n.0.replace("_", "").parse::<PescNumber>() {
                         Ok(o) => o,
                         Err(_) => return Err(PescError::new(Some(i), None,
                             PescErrorType::InvalidNumberLit(n.0)))
                     };
 
-                    toks.push(PescToken::Number(num));
+                    toks.push(PescToken::Number(num * sign));
                 },
 
                 '(' => {
+                    let mut sign = 1_f64;
+
                     let n = chomp(&chs, i + 1, |c| c == ')');
                     i = n.1 + 1;
+
+                    if n.0.len() == 0 {
+                        return Err(PescError::new(Some(i), None,
+                            PescErrorType::EmptyLiteral));
+                    } else {
+                        if n.0.chars().nth(0).unwrap() == '_' {
+                            // we don't need to check for a '-' prefix,
+                            // as the parse::<f64>() function will detect
+                            // that for us
+                            sign = -1_f64;
+                        }
+                    }
 
                     let num = match n.0.replace("_", "").parse::<PescNumber>() {
                         Ok(o) => o,
@@ -169,7 +195,7 @@ impl Pesc {
                             PescErrorType::InvalidNumberLit(n.0)))
                     };
 
-                    toks.push(PescToken::Number(num));
+                    toks.push(PescToken::Number(num * sign));
                 },
 
                 // strings
