@@ -13,7 +13,3 @@ rustyline-derive = "0.3.1"
 [dependencies.rustyline]
 version = "6.3"
 default-features = false
-
-[dependencies.chrono]
-version = "0.4"
-default-features = false
