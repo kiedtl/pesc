@@ -1,3 +1,4 @@
+use std::time;
 use crate::pesc::*;
 use crate::tty::{
     self, OutputStream,
@@ -17,6 +18,19 @@ impl OutputMode {
             OutputMode::Human
         } else {
             OutputMode::Simple
+        }
+    }
+
+    pub fn format_elapsed(&self, dur: time::Duration) {
+        match self {
+            OutputMode::Human => {
+                println!("{b}Done in {e:.2?}.{r}",
+                    b = TermStyle::Bold, r = TermStyle::Reset,
+                    e = dur);
+            },
+            OutputMode::Machine => unimplemented!(),
+            OutputMode::Simple => println!("elapsed: {:.2?}", dur),
+            OutputMode::Quiet => (),
         }
     }
 

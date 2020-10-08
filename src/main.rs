@@ -14,6 +14,8 @@ use crate::clihints::*;
 use crate::output::*;
 use crate::args::*;
 
+use std::time::Instant;
+
 use rustyline::{
     config::{
         Builder,
@@ -55,10 +57,8 @@ fn main() {
 
         match pesc.eval(&parsed.1) {
             Ok(()) => output.format_stack(&pesc.stack),
-            Err((b, e)) => {
+            Err((_, e)) => {
                 println!("pesc: error: {}", e);
-                println!("pesc: problematic stack:");
-                output.format_stack(&b);
             },
         }
 
@@ -79,6 +79,8 @@ fn main() {
     loop {
         match rl.readline("pesc> ") {
             Ok(line) => {
+                let now = Instant::now();
+
                 let parsed = match Pesc::parse(&line) {
                     Ok(r) => r,
                     Err(e) => {
@@ -89,15 +91,14 @@ fn main() {
 
                 match pesc.eval(&parsed.1) {
                     Ok(()) => (),
-                    Err((b, e)) => {
+                    Err((_, e)) => {
                         println!("error: {}", e);
-                        println!("problematic stack:");
-                        output.format_stack(&b);
-                        println!("\n\n");
                     },
                 }
 
                 output.format_stack(&pesc.stack);
+                println!();
+                output.format_elapsed(now.elapsed());
             },
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) =>
