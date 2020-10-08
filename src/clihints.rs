@@ -9,17 +9,17 @@ use crate::errors::*;
 
 use rustyline::error::ReadlineError;
 use rustyline::{
-    hint::Hinter, Context, Editor,
+    hint::Hinter, Context,
     validate::{
         ValidationContext, Validator,
         ValidationResult::{
-            self, Incomplete, Invalid, Valid
+            self, Incomplete, Valid
         },
     },
 };
 use rustyline_derive::{
     Completer, Helper,
-    Highlighter, Validator
+    Highlighter,
 };
 
 #[derive(Completer, Helper, Highlighter)]
