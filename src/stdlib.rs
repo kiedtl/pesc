@@ -3,7 +3,6 @@ use std::vec::Vec;
 use crate::errors::*;
 use crate::pesc::*;
 use crate::utils::*;
-use std::ops::*;
 use crate::rand;
 
 const PESC_EX_E_ITERS: usize = 64;
@@ -500,8 +499,6 @@ pub fn pesc_ex_round(p: &mut Pesc) -> Result<(), PescErrorType> {
 
 pub fn pesc_ex_torn(p: &mut Pesc) -> Result<(), PescErrorType> {
     let mut v = p.pop_number()?.round() as usize;
-
-    let bufsz = 2048 + 6;
     let mut buf: Vec<char> = Vec::new();
 
     while v != 0 {

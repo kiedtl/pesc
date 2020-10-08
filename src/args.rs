@@ -69,9 +69,10 @@ impl Options {
         };
 
         if matches.opt_present("h") {
-            Options::usage(&argv0, opts);
+            Options::usage(&argv0);
             return Err(());
         } else if matches.opt_present("V") {
+            // TODO
             todo!();
         }
 
@@ -106,7 +107,7 @@ impl Options {
         Ok(self)
     }
 
-    fn usage(argv0: &str, opts: g_Options) {
+    fn usage(argv0: &str) {
         println!("Usage: {} [OPTION]...
 
 Options:

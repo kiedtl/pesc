@@ -51,8 +51,6 @@ pub fn lcm(a: usize, b: usize) -> usize {
 
 // Josef Stein's binary GCD algorithm
 pub fn gcd(mut u: usize, mut v: usize) -> usize {
-    let mut shift = 0;
-
     // gcd(0, v) == v, gcd(u, 0) == u
     if u == 0 {
         return v;

@@ -73,7 +73,7 @@ impl Pesc {
                             PescError::new(None, Some(t.clone()), e))),
                     };
                 },
-                PescToken::Func(f) => {
+                PescToken::Func(_) => {
                     match self.exec(t.clone()) {
                         Ok(()) => (),
                         Err((b, e)) => return Err((b,
@@ -90,7 +90,7 @@ impl Pesc {
     pub fn try_exec(&mut self, tok: PescToken) -> Result<(), PescErrorType> {
         match self.exec(tok) {
             Ok(()) => Ok(()),
-            Err((b, e)) => Err(e),
+            Err((_, e)) => Err(e),
         }
     }
 
