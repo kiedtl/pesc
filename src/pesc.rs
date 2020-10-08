@@ -67,6 +67,13 @@ impl Pesc {
                             PescError::new(None, Some(t.clone()), e))),
                     };
                 },
+                PescToken::Func(f) => {
+                    match self.exec(t.clone()) {
+                        Ok(()) => (),
+                        Err((b, e)) => return Err((b,
+                            PescError::new(None, Some(t.clone()), e))),
+                    };
+                },
                 _ => self.stack.push(t.clone()),
             }
         }

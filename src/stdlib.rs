@@ -45,7 +45,6 @@ pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
 }
 
 pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
-    // TODO: operators
     vec![
         (None,      "lte",     rc_box!(pesc_ex_lte)),
         (None,      "gte",     rc_box!(pesc_ex_gte)),
