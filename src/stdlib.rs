@@ -18,45 +18,45 @@ macro_rules! rc_box {
 
 pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
-        (Some('+'), "add", rc_box!(pesc_add)),
-        (Some('-'), "sub", rc_box!(pesc_sub)),
-        (Some('*'), "mul", rc_box!(pesc_mul)),
-        (Some('/'), "div", rc_box!(pesc_div)),
-        (Some('÷'), "div", rc_box!(pesc_div)),
-        (Some('^'), "pow", rc_box!(pesc_pow)),
-        (Some('%'), "mod", rc_box!(pesc_mod)),
+        (Some('+'), "add",  rc_box!(pesc_add)),
+        (Some('-'), "sub",  rc_box!(pesc_sub)),
+        (Some('*'), "mul",  rc_box!(pesc_mul)),
+        (Some('/'), "div",  rc_box!(pesc_div)),
+        (Some('÷'), "div",  rc_box!(pesc_div)),
+        (Some('^'), "pow",  rc_box!(pesc_pow)),
+        (Some('%'), "mod",  rc_box!(pesc_mod)),
 
-        (Some('#'), "dup", rc_box!(pesc_dup)),
-        (Some('$'), "pop", rc_box!(pesc_pop)),
-        (Some(','), "swp", rc_box!(pesc_swp)),
-        (Some('ø'), "get", rc_box!(pesc_get)),
-        (Some('@'), "rot", rc_box!(pesc_rot)),
+        (Some('#'), "dup",  rc_box!(pesc_dup)),
+        (Some('$'), "pop",  rc_box!(pesc_pop)),
+        (Some(','), "swp",  rc_box!(pesc_swp)),
+        (Some('ø'), "get",  rc_box!(pesc_get)),
+        (Some('@'), "rot",  rc_box!(pesc_rot)),
 
-        (Some('!'), "neg", rc_box!(pesc_b_neg)),
-        (Some('&'), "and", rc_box!(pesc_b_and)),
-        (Some('|'), "or",  rc_box!(pesc_b_or)),
-        (Some('='), "eq?", rc_box!(pesc_b_eq)),
-        (Some('<'), "gt?", rc_box!(pesc_b_gt)),
-        (Some('>'), "lt?", rc_box!(pesc_b_lt)),
-        (Some('?'), "if?", rc_box!(pesc_b_cond)),
+        (Some('&'), "band", rc_box!(pesc_ex_band)),
+        (Some('|'), "bor",  rc_box!(pesc_ex_bor)),
+        (Some('X'), "bxor", rc_box!(pesc_ex_bxor)),
+        (Some('<'), "shl",  rc_box!(pesc_ex_bshiftl)),
+        (Some('>'), "shr",  rc_box!(pesc_ex_bshiftr)),
 
-        (Some(';'), "run", rc_box!(pesc_run)),
+        (Some('!'), "neg",  rc_box!(pesc_b_neg)),
+        (Some(';'), "run",  rc_box!(pesc_run)),
     ]
 }
 
 pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
+        (None,      "and",     rc_box!(pesc_b_and)),
+        (None,      "or",      rc_box!(pesc_b_or)),
+        (None,      "eq?",     rc_box!(pesc_b_eq)),
+        (None,      "gt?",     rc_box!(pesc_b_gt)),
+        (None,      "lt?",     rc_box!(pesc_b_lt)),
+        (Some('?'), "if?",     rc_box!(pesc_b_cond)),
+
         (None,      "lte",     rc_box!(pesc_ex_lte)),
         (None,      "gte",     rc_box!(pesc_ex_gte)),
         (None,      "def",     rc_box!(pesc_ex_def)),
         (Some('s'), "size",    rc_box!(pesc_ex_size)),
         (Some('r'), "rand",    rc_box!(pesc_ex_rand)),
-
-        (None,      "band",    rc_box!(pesc_ex_band)),
-        (None,      "bor",     rc_box!(pesc_ex_bor)),
-        (None,      "bxor",    rc_box!(pesc_ex_bxor)),
-        (None,      "shl",     rc_box!(pesc_ex_bshiftl)),
-        (None,      "shr",     rc_box!(pesc_ex_bshiftr)),
 
         (None,      "sin",     rc_box!(pesc_ex_sin)),
         (None,      "cos",     rc_box!(pesc_ex_cos)),
@@ -256,15 +256,6 @@ pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescErrorType> {
 
     Ok(())
 }
-
-// --- misc functions ---
-
-pub fn pesc_run(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let f = p.pop()?;
-    p.try_exec(f)
-}
-
-// --- extended stdlib ---
 
 pub fn pesc_ex_lte(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()?;
@@ -605,3 +596,11 @@ pub fn pesc_ex_prime(p: &mut Pesc) -> Result<(), PescErrorType> {
     p.push(PescToken::Bool(is_prime(x)));
     Ok(())
 }
+
+// --- misc functions ---
+
+pub fn pesc_run(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let f = p.pop()?;
+    p.try_exec(f)
+}
+
