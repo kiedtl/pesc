@@ -5,7 +5,7 @@ use crate::tty::{
     TermStyle, TermColor
 };
 
-const PADDING: usize = 11;
+const PADDING: usize = 3;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum OutputMode {

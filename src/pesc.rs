@@ -71,15 +71,8 @@ impl Pesc {
     {
         for t in code {
             match t {
-                PescToken::Symbol(o) => {
-                    let func = PescToken::Func(self.ops[o].clone());
-                    match self.exec(func) {
-                        Ok(()) => (),
-                        Err((b, e)) => return Err((b,
-                            PescError::new(None, Some(t.clone()), e))),
-                    };
-                },
-                PescToken::Func(_) => {
+                PescToken::Symbol(_)
+                | PescToken::Func(_) => {
                     match self.exec(t.clone()) {
                         Ok(()) => (),
                         Err((b, e)) => return Err((b,
@@ -104,6 +97,14 @@ impl Pesc {
         -> Result<(), (Vec<PescToken>, PescErrorType)>
     {
         match tok {
+            PescToken::Symbol(o) => {
+                if !self.ops.contains_key(&o) {
+                    return Err((self.stack.clone(),
+                        PescErrorType::UnknownFunction(format!("'{}'", o))));
+                }
+
+                self.exec(PescToken::Func(self.ops[&o].clone()))
+            },
             PescToken::Func(_func) => {
                 let func = _func.to_lowercase();
                 if !self.funcs.contains_key(&func) {
