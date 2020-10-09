@@ -31,17 +31,33 @@ Examples
 
 +--------------------------------------------------------------------------+
 |                                                                          |
-| \ comments are started with a '\'                                        |
-| \ notice the terse syntax.                                               |
-|                                                                          |
-| pesc> 2#*           \ push 2 to the stack, dup it, and multiply them.    |
-| [4]                                                                      |
-| pesc> (0x32ab_4f)   \ push 0x32ab4f to the stack                         |
-| [3320655] 4         \ now there are two items on the stack.              |
-| pesc> ,#            \ rotate the first two items, and dup the first one. |
-| [4] 4 3320655                                                            |
+| pesc> # this is a comment.                                               |
+| pesc> 3 3*                                                               |
+| [  9]                                                                    |
+|     0                                                                    |
+| pesc> 34^                                                                |
+| [278128389443693520000000000000000]                                      |
+|                                   0                                      |
+| pesc> [pi]                                                               |
+| [3.1415926535897936][278128389443693520000000000000000]                  |
+|                    0                                  1                  |
+| pesc> ,/                                                                 |
+| [0.000000000000000000000000000000011295476380075908]                     |
+|                                                    0                     |
+| pesc> 2 2[ack]                                                           |
+| [  7][0.000000000000000000000000000000011295476380075908]                |
+|     0                                                   1                |
+| pesc> 2 3[ack]**                                                         |
+| [0.0000000000000000000000000000007116150119447822]                       |
+|                                                  0                       |
+| pesc> $3\                                                                |
+| [  3][  3]                                                               |
+|     0    1                                                               |
+| pesc>                                                                    |
 |                                                                          |
 +--------------------------------------------------------------------------+
+
+See the examples/ directory.
 
 
 Inspiration
