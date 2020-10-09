@@ -31,19 +31,20 @@ pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
         (Some('ø'), "get",  rc_box!(pesc_get)),
         (Some('@'), "rot",  rc_box!(pesc_rot)),
 
-        (Some('&'), "band", rc_box!(pesc_ex_band)),
-        (Some('|'), "bor",  rc_box!(pesc_ex_bor)),
-        (Some('X'), "bxor", rc_box!(pesc_ex_bxor)),
-        (Some('<'), "shl",  rc_box!(pesc_ex_bshiftl)),
-        (Some('>'), "shr",  rc_box!(pesc_ex_bshiftr)),
+        (Some('&'), "band", rc_box!(pesc_band)),
+        (Some('~'), "bnot", rc_box!(pesc_bnot)),
+        (Some('|'), "bor",  rc_box!(pesc_bor)),
+        (Some('X'), "bxor", rc_box!(pesc_bxor)),
+        (Some('<'), "shl",  rc_box!(pesc_bshiftl)),
+        (Some('>'), "shr",  rc_box!(pesc_bshiftr)),
 
-        (Some('!'), "neg",  rc_box!(pesc_b_neg)),
         (Some(';'), "run",  rc_box!(pesc_run)),
     ]
 }
 
 pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
+        (Some('!'), "neg",  rc_box!(pesc_b_neg)),
         (None,      "and",     rc_box!(pesc_b_and)),
         (None,      "or",      rc_box!(pesc_b_or)),
         (None,      "eq?",     rc_box!(pesc_b_eq)),
@@ -293,7 +294,7 @@ pub fn pesc_ex_rand(p: &mut Pesc) -> Result<(), PescErrorType> {
     Ok(())
 }
 
-pub fn pesc_ex_band(p: &mut Pesc) -> Result<(), PescErrorType> {
+pub fn pesc_band(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
 
@@ -301,7 +302,14 @@ pub fn pesc_ex_band(p: &mut Pesc) -> Result<(), PescErrorType> {
     Ok(())
 }
 
-pub fn pesc_ex_bor(p: &mut Pesc) -> Result<(), PescErrorType> {
+pub fn pesc_bnot(p: &mut Pesc) -> Result<(), PescErrorType> {
+    let x = p.pop_number()? as usize;
+
+    p.push(PescToken::Number(!x as f64));
+    Ok(())
+}
+
+pub fn pesc_bor(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
 
@@ -309,7 +317,7 @@ pub fn pesc_ex_bor(p: &mut Pesc) -> Result<(), PescErrorType> {
     Ok(())
 }
 
-pub fn pesc_ex_bxor(p: &mut Pesc) -> Result<(), PescErrorType> {
+pub fn pesc_bxor(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
 
@@ -317,7 +325,7 @@ pub fn pesc_ex_bxor(p: &mut Pesc) -> Result<(), PescErrorType> {
     Ok(())
 }
 
-pub fn pesc_ex_bshiftr(p: &mut Pesc) -> Result<(), PescErrorType> {
+pub fn pesc_bshiftr(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
 
@@ -325,7 +333,7 @@ pub fn pesc_ex_bshiftr(p: &mut Pesc) -> Result<(), PescErrorType> {
     Ok(())
 }
 
-pub fn pesc_ex_bshiftl(p: &mut Pesc) -> Result<(), PescErrorType> {
+pub fn pesc_bshiftl(p: &mut Pesc) -> Result<(), PescErrorType> {
     let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
 
