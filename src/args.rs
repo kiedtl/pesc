@@ -16,7 +16,6 @@ pub struct Options {
     pub force_interactive: bool,
     pub load_lua: bool,
     pub load_extra: Option<String>,
-    pub savefile: Option<String>,
     pub colors: Colors,
     pub output: OutputMode,
 }
@@ -30,7 +29,6 @@ impl Options {
             force_interactive: false,
             load_lua: false,
             load_extra: None,
-            savefile: None,
             colors: Colors::Auto,
             output: OutputMode::auto(),
         }
@@ -49,12 +47,6 @@ impl Options {
         opts.optflag("l", "load", "load extended stdlib from $PESCLIBS.");
         opts.optflag("j", "json", "print the stack in JSON.");
 
-        opts.optopt("f", "file", "execute <FILE>, print the result, and exit.",
-            "FILE");
-        opts.optopt("s", "save", "save pesc's state in <FILE> before exiting.",
-            "FILE");
-        opts.optopt("r", "restore", "restore pesc's state from <FILE>.",
-            "FILE");
         opts.optopt("L", "lua", "load the Lua file(s) in <PATH>.",
             "PATH");
         opts.optopt("", "color", "use colors: 'never', 'auto', 'always'.",
@@ -76,12 +68,17 @@ impl Options {
             todo!();
         }
 
+        self.file = if !matches.free.is_empty() {
+            Some(matches.free[0].clone())
+        } else {
+            None
+        };
+
         self.quiet = matches.opt_present("q");
-        self.file = matches.opt_str("f");
         self.force_interactive = matches.opt_present("i");
         self.load_lua = matches.opt_present("l");
         self.load_extra = matches.opt_str("L");
-        self.savefile = matches.opt_str("s");
+
         self.colors = match matches.opt_str("color") {
             None => self.colors,
             Some(c) => match c.as_str() {
@@ -94,6 +91,7 @@ impl Options {
                 },
             },
         };
+
         self.output = {
             if matches.opt_present("j") {
                 OutputMode::Machine
@@ -108,7 +106,7 @@ impl Options {
     }
 
     fn usage(argv0: &str) {
-        println!("Usage: {} [OPTION]...
+        println!("Usage: {} [OPTION]... [FILE]
 
 Options:
     -h, --help             print this help message.
