@@ -100,32 +100,32 @@ pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
 // --- math functions ---
 
 pub fn pesc_add(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Number(a + b));
     Ok(())
 }
 
 pub fn pesc_sub(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Number(a - b));
     Ok(())
 }
 
 pub fn pesc_mul(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Number(a * b));
     Ok(())
 }
 
 pub fn pesc_div(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     if b == 0_f64 {
         Err(PescErrorType::DivideByZero(a, b))
@@ -136,16 +136,16 @@ pub fn pesc_div(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_pow(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Number(a.powf(b)));
     Ok(())
 }
 
 pub fn pesc_mod(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     if b == 0_f64 {
         Err(PescErrorType::DivideByZero(a, b))
@@ -205,40 +205,40 @@ pub fn pesc_b_neg(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_b_and(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_boolean()?;
     let b = p.pop_boolean()?;
+    let a = p.pop_boolean()?;
 
     p.push(PescToken::Bool(a && b));
     Ok(())
 }
 
 pub fn pesc_b_or(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_boolean()?;
     let b = p.pop_boolean()?;
+    let a = p.pop_boolean()?;
 
     p.push(PescToken::Bool(a || b));
     Ok(())
 }
 
 pub fn pesc_b_eq(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop()?;
     let b = p.pop()?;
+    let a = p.pop()?;
 
     p.push(PescToken::Bool(a == b));
     Ok(())
 }
 
 pub fn pesc_b_gt(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Bool(a < b));
     Ok(())
 }
 
 pub fn pesc_b_lt(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Bool(a > b));
     Ok(())
@@ -258,16 +258,16 @@ pub fn pesc_b_cond(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_ex_lte(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Bool(a >= b));
     Ok(())
 }
 
 pub fn pesc_ex_gte(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Bool(a <= b));
     Ok(())
@@ -295,8 +295,8 @@ pub fn pesc_ex_rand(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_band(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
+    let a = p.pop_number()? as usize;
 
     p.push(PescToken::Number((a & b) as f64));
     Ok(())
@@ -310,32 +310,32 @@ pub fn pesc_bnot(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_bor(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
+    let a = p.pop_number()? as usize;
 
     p.push(PescToken::Number((a | b) as f64));
     Ok(())
 }
 
 pub fn pesc_bxor(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
+    let a = p.pop_number()? as usize;
 
     p.push(PescToken::Number((a ^ b) as f64));
     Ok(())
 }
 
 pub fn pesc_bshiftr(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
+    let a = p.pop_number()? as usize;
 
     p.push(PescToken::Number((a >> b) as f64));
     Ok(())
 }
 
 pub fn pesc_bshiftl(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
+    let a = p.pop_number()? as usize;
 
     p.push(PescToken::Number((a << b) as f64));
     Ok(())
@@ -391,8 +391,8 @@ pub fn pesc_ex_atan(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_ex_log(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Number(a.log(b)));
     Ok(())
@@ -401,6 +401,7 @@ pub fn pesc_ex_log(p: &mut Pesc) -> Result<(), PescErrorType> {
 pub fn pesc_ex_pi(p: &mut Pesc) -> Result<(), PescErrorType> {
     // machin formula
     // pi = (4 * arctangent(1/5) - arctangent(1/239)) * 4
+    // TODO: move to utility function
 
     let pi = (4_f64 * (1_f64/5_f64).atan()
         - (1_f64/239_f64).atan()) * 4_f64;
@@ -414,6 +415,7 @@ pub fn pesc_ex_e(p: &mut Pesc) -> Result<(), PescErrorType> {
     // e = 1 + \   ───
     //         /__ +n!
     //         n=0
+    // TODO: move to utility function
 
     #[inline]
     fn calc_e(iters: usize, accm: f64) -> f64 {
@@ -433,16 +435,16 @@ pub fn pesc_ex_e(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_ex_min(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Number(if a < b { a } else { b }));
     Ok(())
 }
 
 pub fn pesc_ex_max(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()?;
     let b = p.pop_number()?;
+    let a = p.pop_number()?;
 
     p.push(PescToken::Number(if a > b { a } else { b }));
     Ok(())
@@ -543,24 +545,24 @@ pub fn pesc_ex_frrn(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_ex_gcd(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let u = p.pop_number()? as usize;
     let v = p.pop_number()? as usize;
+    let u = p.pop_number()? as usize;
 
     p.push(PescToken::Number(gcd(u, v) as f64));
     Ok(())
 }
 
 pub fn pesc_ex_lcm(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let a = p.pop_number()? as usize;
     let b = p.pop_number()? as usize;
+    let a = p.pop_number()? as usize;
 
     p.push(PescToken::Number(lcm(a, b) as f64));
     Ok(())
 }
 
 pub fn pesc_ex_ack(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let m = p.pop_number()? as usize;
     let n = p.pop_number()? as usize;
+    let m = p.pop_number()? as usize;
 
     p.push(PescToken::Number(ackermann(m, n) as f64));
     Ok(())
@@ -588,8 +590,8 @@ pub fn pesc_ex_abs(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_ex_coprime(p: &mut Pesc) -> Result<(), PescErrorType> {
-    let u = p.pop_number()? as usize;
     let v = p.pop_number()? as usize;
+    let u = p.pop_number()? as usize;
 
     p.push(PescToken::Bool(gcd(u, v) == 1));
     Ok(())
