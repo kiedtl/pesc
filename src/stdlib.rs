@@ -17,28 +17,28 @@ macro_rules! rc_box {
 
 pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
-        (Some('+'), "add",  rc_box!(pesc_add)),
-        (Some('-'), "sub",  rc_box!(pesc_sub)),
-        (Some('*'), "mul",  rc_box!(pesc_mul)),
-        (Some('/'), "div",  rc_box!(pesc_div)),
-        (Some('÷'), "div",  rc_box!(pesc_div)),
-        (Some('^'), "pow",  rc_box!(pesc_pow)),
-        (Some('%'), "mod",  rc_box!(pesc_mod)),
+        (Some('+'),  "add",  rc_box!(pesc_add)),
+        (Some('-'),  "sub",  rc_box!(pesc_sub)),
+        (Some('*'),  "mul",  rc_box!(pesc_mul)),
+        (Some('/'),  "div",  rc_box!(pesc_div)),
+        (Some('÷'),  "div",  rc_box!(pesc_div)),
+        (Some('^'),  "pow",  rc_box!(pesc_pow)),
+        (Some('%'),  "mod",  rc_box!(pesc_mod)),
 
-        (Some('#'), "dup",  rc_box!(pesc_dup)),
-        (Some('$'), "pop",  rc_box!(pesc_pop)),
-        (Some(','), "swp",  rc_box!(pesc_swp)),
-        (Some('ø'), "get",  rc_box!(pesc_get)),
-        (Some('@'), "rot",  rc_box!(pesc_rot)),
+        (Some('\\'), "dup",  rc_box!(pesc_dup)),
+        (Some('$'),  "pop",  rc_box!(pesc_pop)),
+        (Some(','),  "swp",  rc_box!(pesc_swp)),
+        (Some('ø'),  "get",  rc_box!(pesc_get)),
+        (Some('@'),  "rot",  rc_box!(pesc_rot)),
 
-        (Some('&'), "band", rc_box!(pesc_band)),
-        (Some('~'), "bnot", rc_box!(pesc_bnot)),
-        (Some('|'), "bor",  rc_box!(pesc_bor)),
-        (Some('X'), "bxor", rc_box!(pesc_bxor)),
-        (Some('<'), "shl",  rc_box!(pesc_bshiftl)),
-        (Some('>'), "shr",  rc_box!(pesc_bshiftr)),
+        (Some('&'),  "band", rc_box!(pesc_band)),
+        (Some('~'),  "bnot", rc_box!(pesc_bnot)),
+        (Some('|'),  "bor",  rc_box!(pesc_bor)),
+        (Some('X'),  "bxor", rc_box!(pesc_bxor)),
+        (Some('<'),  "shl",  rc_box!(pesc_bshiftl)),
+        (Some('>'),  "shr",  rc_box!(pesc_bshiftr)),
 
-        (Some(';'), "run",  rc_box!(pesc_run)),
+        (Some(';'),  "run",  rc_box!(pesc_run)),
     ]
 }
 

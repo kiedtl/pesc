@@ -281,7 +281,7 @@ impl Pesc {
                 | ' ' => { i += 1; continue; },
 
                 // comments
-                '\\' =>
+                '#' =>
                     i = chomp(&chs, i + 1, |c| c == '\n' || c == '\\').1 + 1,
 
                 // boolean values
