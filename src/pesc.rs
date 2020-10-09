@@ -265,20 +265,15 @@ impl Pesc {
 
                 // macros
                 '{' => {
-                    let m = chomp(&chs, i + 1, |c| c == '}');
-
-                    if m.2 {
-                        // we hit the end of the data
-                        // without finding a matching bracket
-                        return Err(PescError::new(Some(i), None,
-                            PescErrorType::UnmatchedToken('{')));
-                    }
-
-                    i += m.1 + 1;
-
-                    let res = Pesc::parse(&m.0)?;
+                    let res = Pesc::parse(&input[i + 1..])?;
                     toks.push(PescToken::Macro(res.1));
+
+                    // move pointer past matching '}', or we
+                    // will exit prematurely (see next item)
+                    i += res.0 + 2;
                 },
+
+                '}' => return Ok((i, toks)),
 
                 // whitespace
                 '\n'
