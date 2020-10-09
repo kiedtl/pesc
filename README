@@ -42,3 +42,20 @@ Examples
 | [4] 4 3320655                                                            |
 |                                                                          |
 +--------------------------------------------------------------------------+
+
+
+Inspiration
+===========
+
+Pesc draws ideas from many languages/tools. Here is a non-comprehensive
+list:
+
+1. dc, a "reverse-polish desk calculator"
+2. FALSE, an esoteric stack-based programming language that inspired the
+creation of Brainf*ck.
+3. FORTH, an imperative stack-based programming language that powered the
+Philae spacecraft.
+4. Joy, a purely functional stack-based programming language.
+5. GNU bc, the omnipresent basic calculator
+6. Nerdypepper's eva (https://github.com/nerdypepper/eva). If you don't
+like stack-based languages, you should check this out.
