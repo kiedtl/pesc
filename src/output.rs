@@ -6,6 +6,7 @@ use crate::tty::{
 };
 
 const PADDING: usize = 3;
+const MORE_STR: &'static str = " »";
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum OutputMode {
@@ -50,7 +51,7 @@ impl OutputMode {
                     TermStyle::BrightFg(TermColor::Black));
                 let mut ctr = 0;
 
-                for i in stack.iter().rev() {
+                let mut format_output = |i: &PescToken, ctr, first| -> bool {
                     let item_color = match i {
                         PescToken::Str(_) => TermStyle::Fg(TermColor::Cyan),
                         PescToken::Number(_) => TermStyle::BrightFg(TermColor::White),
@@ -59,24 +60,38 @@ impl OutputMode {
                         _ => TermStyle::Fg(TermColor::White),
                     };
 
-                    let fmt_item = format!("{g}[{r}{c}{item:>0$}{r}{g}]{r}",
+                    let fmt_item = format!("{g}[{r}{f}{c}{item:>0$}{r}{g}]{r}",
                         PADDING, c = item_color,
                         g = TermStyle::BrightFg(TermColor::Black),
-                        r = TermStyle::Reset, item = i.to_string());
+                        r = TermStyle::Reset, item = i.to_string(),
+                        f = if first { TermStyle::Bold } else { TermStyle::Reset });
 
                     if TermStyle::strip(&item_buf).len()
                         + TermStyle::strip(&fmt_item).len() + 1 >= max_sz {
-                            item_buf += " »";
-                            break;
+                            item_buf += MORE_STR;
+                            true
                     } else {
                         item_buf += &fmt_item;
                         num_buf  += &format!("{c:>0$}",
-                            TermStyle::strip(&fmt_item).len(), c = ctr);
+                            TermStyle::strip(&fmt_item).len(), c = &ctr);
+                        false
+                    }
+                };
+
+                // treat the first item in the stack specially
+                format_output(&stack[stack.len() - 1], ctr, true);
+                ctr += 1;
+
+                // and the rest...
+                for i in stack.iter().rev().skip(1) {
+                    if format_output(i, ctr, false) {
+                        break;
+                    } else {
                         ctr += 1;
                     }
                 }
 
-                num_buf += "\x1b[m";
+                num_buf += &TermStyle::Reset.to_string();
                 println!("{}\n{}", item_buf, num_buf);
             },
             OutputMode::Simple
