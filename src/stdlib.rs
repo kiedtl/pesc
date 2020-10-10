@@ -399,38 +399,12 @@ pub fn pesc_ex_log(p: &mut Pesc) -> Result<(), PescErrorType> {
 }
 
 pub fn pesc_ex_pi(p: &mut Pesc) -> Result<(), PescErrorType> {
-    // machin formula
-    // pi = (4 * arctangent(1/5) - arctangent(1/239)) * 4
-    // TODO: move to utility function
-
-    let pi = (4_f64 * (1_f64/5_f64).atan()
-        - (1_f64/239_f64).atan()) * 4_f64;
-    p.push(PescToken::Number(pi));
+    p.push(PescToken::Number(pi()));
     Ok(())
 }
 
 pub fn pesc_ex_e(p: &mut Pesc) -> Result<(), PescErrorType> {
-    //         inf
-    //         ___  1
-    // e = 1 + \   ───
-    //         /__ +n!
-    //         n=0
-    // TODO: move to utility function
-
-    #[inline]
-    fn calc_e(iters: usize, accm: f64) -> f64 {
-        match iters {
-            0 => accm,
-            _ => {
-                let naccm = 1_f64 / factorial(iters) as f64;
-                calc_e(iters - 1, accm + naccm)
-            }
-        }
-    }
-
-    let e = 1_f64 + calc_e(PESC_EX_E_ITERS, 0_f64);
-
-    p.push(PescToken::Number(e));
+    p.push(PescToken::Number(e(PESC_EX_E_ITERS)));
     Ok(())
 }
 

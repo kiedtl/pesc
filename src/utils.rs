@@ -1,5 +1,33 @@
-use std::mem::swap;
 use crate::errors::*;
+
+pub fn pi() -> f64 {
+    // machin formula
+    // pi = (4 * arctangent(1/5) - arctangent(1/239)) * 4
+
+    (4_f64 * (1_f64/5_f64).atan()
+        - (1_f64/239_f64).atan()) * 4_f64
+}
+
+pub fn e(e_iters: usize) -> f64 {
+    //         inf
+    //         ___  1
+    // e = 1 + \   ───
+    //         /__ +n!
+    //         n=0
+
+    #[inline]
+    fn calc_e(iters: usize, accm: f64) -> f64 {
+        match iters {
+            0 => accm,
+            _ => {
+                let naccm = 1_f64 / factorial(iters) as f64;
+                calc_e(iters - 1, accm + naccm)
+            }
+        }
+    }
+
+    1_f64 + calc_e(e_iters, 0_f64)
+}
 
 pub fn is_prime(x: usize) -> bool {
     // stolen from this SO answer:
@@ -51,6 +79,8 @@ pub fn lcm(a: usize, b: usize) -> usize {
 
 // Josef Stein's binary GCD algorithm
 pub fn gcd(mut u: usize, mut v: usize) -> usize {
+    use std::mem::swap;
+
     // gcd(0, v) == v, gcd(u, 0) == u
     if u == 0 {
         return v;
