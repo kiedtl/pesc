@@ -5,7 +5,6 @@ mod stdlib;
 mod clihints;
 mod tty;
 mod output;
-mod serde;
 mod rand;
 mod utils;
 
