@@ -9,7 +9,7 @@ const PADDING: usize = 3;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum OutputMode {
-    Human, Machine, Simple, Quiet
+    Human, Simple, Quiet
 }
 
 impl OutputMode {
@@ -28,7 +28,6 @@ impl OutputMode {
                     b = TermStyle::Bold, r = TermStyle::Reset,
                     e = dur);
             },
-            OutputMode::Machine => unimplemented!(),
             OutputMode::Simple => println!("elapsed: {:.2?}", dur),
             OutputMode::Quiet => (),
         }
@@ -79,7 +78,6 @@ impl OutputMode {
                 num_buf += "\x1b[m";
                 println!("{}\n{}", item_buf, num_buf);
             },
-            OutputMode::Machine => unimplemented!(),
             OutputMode::Simple
             | OutputMode::Quiet => stack.iter()
                     .rev()

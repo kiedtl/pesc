@@ -11,7 +11,6 @@ mod utils;
 
 use crate::pesc::*;
 use crate::clihints::*;
-use crate::output::*;
 use crate::args::*;
 
 use std::time::Instant;
@@ -32,7 +31,6 @@ fn main() {
     };
 
     let mut pesc = Pesc::new();
-    let output = OutputMode::auto();
 
     // load standard library
     for func in stdlib::standard() {
@@ -56,7 +54,7 @@ fn main() {
         };
 
         match pesc.eval(&parsed.1) {
-            Ok(()) => output.format_stack(&pesc.stack),
+            Ok(()) => opts.output.format_stack(&pesc.stack),
             Err((_, e)) => {
                 println!("pesc: error: {}", e);
             },
@@ -96,14 +94,14 @@ fn main() {
                     },
                 }
 
-                output.format_stack(&pesc.stack);
+                opts.output.format_stack(&pesc.stack);
                 println!();
-                output.format_elapsed(now.elapsed());
+                opts.output.format_elapsed(now.elapsed());
             },
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) =>
                 println!("Use Ctrl-D to quit."),
-            Err(_) => output.format_stack(&pesc.stack),
+            Err(_) => opts.output.format_stack(&pesc.stack),
         }
     }
 }

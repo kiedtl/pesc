@@ -11,7 +11,6 @@ pub enum Colors {
 
 #[derive(Clone, Debug)]
 pub struct Options {
-    pub quiet: bool,
     pub file: Option<String>,
     pub force_interactive: bool,
     pub load_lua: bool,
@@ -24,7 +23,6 @@ impl Options {
     // set default values of options
     pub fn new() -> Self {
         Self {
-            quiet: false,
             file: None,
             force_interactive: false,
             load_lua: false,
@@ -45,7 +43,6 @@ impl Options {
         opts.optflag("q", "quiet", "reduce output.");
         opts.optflag("i", "", "force interactive mode.");
         opts.optflag("l", "load", "load extended stdlib from $PESCLIBS.");
-        opts.optflag("j", "json", "print the stack in JSON.");
 
         opts.optopt("L", "lua", "load the Lua file(s) in <PATH>.",
             "PATH");
@@ -74,7 +71,6 @@ impl Options {
             None
         };
 
-        self.quiet = matches.opt_present("q");
         self.force_interactive = matches.opt_present("i");
         self.load_lua = matches.opt_present("l");
         self.load_extra = matches.opt_str("L");
@@ -93,11 +89,13 @@ impl Options {
         };
 
         self.output = {
-            if matches.opt_present("j") {
-                OutputMode::Machine
-            } else if matches.opt_present("q") {
+            // if -q is set, force quiet mode
+            if matches.opt_present("q") {
                 OutputMode::Quiet
             } else {
+                // default to the previous value,
+                // which is set automatically based on
+                // whether stdout is a tty or not
                 self.output
             }
         };
