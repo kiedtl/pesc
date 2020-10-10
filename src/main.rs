@@ -94,8 +94,11 @@ fn main() {
                 }
 
                 opts.output.format_stack(&pesc.stack);
-                println!();
-                opts.output.format_elapsed(now.elapsed());
+
+                if opts.verbose {
+                    println!();
+                    opts.output.format_elapsed(now.elapsed());
+                }
             },
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) =>

@@ -8,6 +8,7 @@ pub struct Options {
     pub load_lua: bool,
     pub load_extra: Option<String>,
     pub output: OutputMode,
+    pub verbose: bool,
 }
 
 impl Options {
@@ -18,6 +19,7 @@ impl Options {
             load_lua: false,
             load_extra: None,
             output: OutputMode::auto(),
+            verbose: false,
         }
     }
 
@@ -32,6 +34,7 @@ impl Options {
         opts.optflag("q", "quiet", "reduce output.");
         opts.optflag("i", "", "force interactive mode.");
         opts.optflag("l", "load", "load extended stdlib from $PESCLIBS.");
+        opts.optflag("v", "verbose", "show elapsed time.");
 
         opts.optopt("L", "lua", "load the Lua file(s) in <PATH>.",
             "PATH");
@@ -60,6 +63,7 @@ impl Options {
 
         self.load_lua = matches.opt_present("l");
         self.load_extra = matches.opt_str("L");
+        self.verbose = matches.opt_present("v");
 
         self.output = {
             // if -q is set, force quiet mode

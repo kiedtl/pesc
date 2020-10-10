@@ -24,8 +24,9 @@ impl OutputMode {
     pub fn format_elapsed(&self, dur: time::Duration) {
         match self {
             OutputMode::Human => {
-                println!("{b}Done in {e:.2?}.{r}",
-                    b = TermStyle::Bold, r = TermStyle::Reset,
+                println!("{g}{i}Done in {e:.2?}.{r}",
+                    g = TermStyle::BrightFg(TermColor::Black),
+                    i = TermStyle::Italic, r = TermStyle::Reset,
                     e = dur);
             },
             OutputMode::Simple => println!("elapsed: {:.2?}", dur),

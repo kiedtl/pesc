@@ -10,7 +10,7 @@ use terminal_size::{Width, Height, terminal_size};
 pub enum TermStyle {
     Bold,
     Underline,
-    //Italic,
+    Italic,
     //Inverted,
     //Blink,
     //Strike,
@@ -57,7 +57,7 @@ impl fmt::Display for TermStyle {
         let r = match self {
             TermStyle::Bold => String::from("\x1b[1m"),
             TermStyle::Underline => String::from("\x1b[4m"),
-            //TermStyle::Italic => String::from("\x1b[3m"),
+            TermStyle::Italic => String::from("\x1b[3m"),
             //TermStyle::Inverted => String::from("\x1b[7m"),
             //TermStyle::Blink => String::from("\x1b[5m"),
             //TermStyle::Strike => String::from("\x1b[9m"),
