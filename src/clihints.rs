@@ -3,38 +3,44 @@
 //
 // TODO: choose a more accurate name for this module
 
-use std::collections::HashSet;
 use crate::pesc::Pesc;
+use crate::tty::*;
 use crate::errors::*;
 
 use rustyline::error::ReadlineError;
 use rustyline::{
-    hint::Hinter, Context,
+    hint::{
+        Hinter,
+        HistoryHinter
+    }, Context,
     validate::{
         ValidationContext, Validator,
         ValidationResult::{
             self, Incomplete, Valid
         },
     },
+    highlight::Highlighter,
 };
 use rustyline_derive::{
     Completer, Helper,
-    Highlighter,
 };
 
-#[derive(Completer, Helper, Highlighter)]
-pub struct CommandHinter {
-    // TODO: use ** radix trie **
-    hints: HashSet<String>,
+use std::borrow::{Cow, Cow::Owned};
+
+#[derive(Completer, Helper)]
+pub struct BustyLine {
+    hinter: HistoryHinter,
 }
 
-impl CommandHinter {
-    pub fn new(hints: HashSet<String>) -> Self {
-        Self { hints: hints }
+impl BustyLine {
+    pub fn new() -> Self {
+        Self {
+            hinter: HistoryHinter {},
+        }
     }
 }
 
-impl Validator for CommandHinter {
+impl Validator for BustyLine {
     fn validate(&self, ctx: &mut ValidationContext)
         -> Result<ValidationResult, ReadlineError>
     {
@@ -53,42 +59,19 @@ impl Validator for CommandHinter {
     }
 }
 
-impl Hinter for CommandHinter {
-    fn hint(&self, line: &str, pos: usize, _ctx: &Context<'_>) -> Option<String> {
-        if pos < line.len() {
-            return None;
-        }
-
-        self.hints
-            .iter()
-            .filter_map(|hint| {
-                // expect hint after word complete, like redis cli, add condition:
-                // line.ends_with(" ")
-                if pos > 0 && hint.starts_with(&line[..pos]) {
-                    Some(hint[pos..].to_owned())
-                } else {
-                    None
-                }
-            })
-            .next()
+impl Hinter for BustyLine {
+    fn hint(&self, line: &str, pos: usize, ctx: &Context<'_>) -> Option<String> {
+        self.hinter.hint(line, pos, ctx)
     }
 }
 
-pub fn hints(p: &Pesc) -> HashSet<String> {
-    let mut set = HashSet::new();
+impl Highlighter for BustyLine {
+    fn highlight_hint<'h>(&self, hint: &'h str) -> Cow<'h, str> {
+        Owned(format!("{}{}{}", TermStyle::BrightFg(TermColor::Black),
+            hint, TermStyle::Reset))
+    }
 
-    // some hints ;)
-    set.insert(String::from("help // read the manpage, dummy"));
-    set.insert(String::from("man  // `man pesc`, if your package manager's worth anything."));
-    set.insert(String::from("man pesc // no, you need to exit first."));
-    set.insert(String::from("quit // just hit Ctrl-D"));
-    set.insert(String::from("exit // it's ^D to quit. Ctrl-D."));
-    set.insert(String::from("nice // gee, thanks"));
-    set.insert(String::from("lol  // what's so funny?"));
-    set.insert(String::from("what // maybe you need to take a look at the manpage"));
-
-    p.funcs.iter().for_each(|f| {
-        set.insert(format!("[{}]", f.0));
-    });
-    set
+    fn highlight<'l>(&self, line: &'l str, _: usize) -> Cow<'l, str> {
+        Owned(line.to_owned())
+    }
 }

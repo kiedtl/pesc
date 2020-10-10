@@ -70,8 +70,8 @@ fn main() {
         .edit_mode(EditMode::Vi)
         .build();
 
-    let mut rl = Editor::<CommandHinter>::with_config(config);
-    rl.set_helper(Some(CommandHinter::new(hints(&pesc))));
+    let mut rl = Editor::<BustyLine>::with_config(config);
+    rl.set_helper(Some(BustyLine::new()));
 
     loop {
         match rl.readline("pesc> ") {
