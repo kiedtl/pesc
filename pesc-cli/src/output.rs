@@ -1,5 +1,6 @@
 use std::time;
-use crate::pesc::*;
+use pesc::pesc::*;
+
 use crate::tty::{
     self, OutputStream,
     TermStyle, TermColor

@@ -3,9 +3,10 @@
 //
 // TODO: choose a more accurate name for this module
 
-use crate::pesc::Pesc;
+use pesc::pesc::Pesc;
+use pesc::errors::*;
+
 use crate::tty::*;
-use crate::errors::*;
 
 use rustyline::error::ReadlineError;
 use rustyline::{

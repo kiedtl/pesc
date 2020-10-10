@@ -1,14 +1,11 @@
 mod args;
-mod errors;
-mod pesc;
-mod stdlib;
 mod clihints;
 mod tty;
 mod output;
-mod rand;
-mod utils;
 
-use crate::pesc::*;
+use pesc::pesc::*;
+use pesc::stdlib;
+
 use crate::clihints::*;
 use crate::args::*;
 
