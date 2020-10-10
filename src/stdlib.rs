@@ -5,7 +5,7 @@ use crate::pesc::*;
 use crate::utils::*;
 use crate::rand;
 
-const PESC_EX_E_ITERS: usize = 64;
+const PESC_EX_E_ITERS: usize = 20;
 
 // --- helper functions ---
 
