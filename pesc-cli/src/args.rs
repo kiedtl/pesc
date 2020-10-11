@@ -1,3 +1,21 @@
+/*
+ * pescli - a CLI Pesc calculator
+ * Copyright (C) 2020 Kiëd Llaentenn <kiedtl [at] protonmail [dot] com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 use crate::output::*;
 use getopts::Options as g_Options;
 use std::env;
@@ -51,8 +69,8 @@ impl Options {
             Options::usage(&argv0);
             return Err(());
         } else if matches.opt_present("V") {
-            // TODO
-            todo!();
+            Options::version();
+            return Err(());
         }
 
         self.file = if !matches.free.is_empty() {
@@ -82,13 +100,22 @@ impl Options {
 
     fn usage(argv0: &str) {
         println!("Usage: {} [OPTION]... [FILE]
+Copyright (c) 2020 Kiëd Llaentenn
 
 Options:
     -h, --help             print this help message.
-    -V, --version          print the version.
+    -V, --version          print the version and license info.
     -q, --quiet            reduce output.
     -l, --load             load extended stdlib from $PESCLIBS.
     -L, --lua     [PATH]   load the Lua file(s) in <PATH>.
+
+Full documentation is available as a manpage (pescli(1)).
+Source: https://github.com/lptstr/pesc
+Reporting issues: https://github.com/lptstr/pesc/issues/new
 ", argv0);
+    }
+
+    fn version() {
+        println!("pescli v{}", crate::VERSION);
     }
 }
