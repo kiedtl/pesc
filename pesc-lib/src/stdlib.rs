@@ -15,6 +15,24 @@ macro_rules! rc_box {
 
 // --- declaration ---
 
+/// Return a list of the functions in the **core** standard library, which
+/// can then be passed to Pesc::load.
+///
+/// Functions included in the core standard library:
+///     - Arithmetic functions: add, sub, mul, div, pow, mod
+///     - Stack operations: dup, pop, swap, get, rot
+///     - Bitwise operations: AND, NOT, OR, XOR, right-shift, left-shift
+///     - the execution operator, used for executing macros in the stack.
+///
+/// # Examples
+///
+/// ```
+/// let mut pesc = Pesc::new();
+///
+/// for func in stdlib::standard() {
+///     pesc.load(func.0, func.1, func.2);
+/// }
+/// ```
 pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
         (Some('+'),  "add",  rc_box!(pesc_add)),
@@ -42,6 +60,20 @@ pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     ]
 }
 
+/// Return a list of the functions in the **extended** standard library, which
+/// can then be passed to Pesc::load.
+///
+/// Consult pescli's manpage to determine the list of functions included here.
+///
+/// # Examples
+///
+/// ```
+/// let mut pesc = Pesc::new();
+///
+/// for func in stdlib::extended() {
+///     pesc.load(func.0, func.1, func.2);
+/// }
+/// ```
 pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
         (Some('!'), "neg",  rc_box!(pesc_b_neg)),
