@@ -1,5 +1,12 @@
+/// Various Pesc parsing/runtime errors.
 pub mod errors;
+
+/// Core Pesc functionality.
 pub mod pesc;
-pub mod rand;
+
+/// Pesc's standard library (arithmetic functions, log,
+/// factorial, pow, sqrt, etc)
 pub mod stdlib;
-pub mod utils;
+
+mod rand;
+mod utils;
