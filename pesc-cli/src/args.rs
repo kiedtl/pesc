@@ -92,9 +92,9 @@ impl Options {
 Copyright (c) 2020 Kiëd Llaentenn
 
 Options:
-    -h, --help             print this help message.
-    -V, --version          print the version and license info.
-    -q, --quiet            reduce output.
+    -h, --help             Print a this help message and exit.
+    -V, --version          Print pescli's version and exit.
+    -q, --quiet            Print as little information as possible.
 
 Full documentation is available as a manpage (pescli(1)).
 Source: https://github.com/lptstr/pesc
