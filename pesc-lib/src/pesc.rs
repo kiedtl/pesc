@@ -3,10 +3,15 @@ use std::fmt::{self, Display};
 use std::collections::HashMap;
 use crate::errors::*;
 
-const BOOLEAN_TRUE:  char = 'T';
-const BOOLEAN_FALSE: char = 'F';
+/// This is a special, reserved operator that pushes (true) to the stack.
+pub const BOOLEAN_TRUE:  char = 'T';
+
+/// Same as BOOLEAN_TRUE, only it pushes (false) to the stack.
+pub const BOOLEAN_FALSE: char = 'F';
 
 #[derive(Clone, Debug, PartialEq)]
+/// A single Pesc token, which can be either the result of parsing
+/// some Pesc code, or be a value on the stack.
 pub enum PescToken {
     Str(String),
     Number(PescNumber),
@@ -47,6 +52,7 @@ impl Pesc {
         }
     }
 
+    /// "Load" a function in order to allow Pesc code to call it.
     pub fn load(&mut self, op: Option<char>, fnname: &str,
         func: Rc<Box<PescFunc>>)
     {
@@ -66,6 +72,8 @@ impl Pesc {
         }
     }
 
+    /// Evaluate some Pesc tokens (that have already been parsed with
+    /// Pesc::parse)
     pub fn eval(&mut self, code: &[PescToken])
         -> Result<(), (Vec<PescToken>, PescError)>
     {
@@ -86,6 +94,8 @@ impl Pesc {
         Ok(())
     }
 
+    /// Execute a Pesc macro or a Pesc function, returning an error
+    /// in the case of failure.
     pub fn try_exec(&mut self, tok: PescToken) -> Result<(), PescErrorType> {
         match self.exec(tok) {
             Ok(()) => Ok(()),
@@ -93,6 +103,8 @@ impl Pesc {
         }
     }
 
+    /// The same as Pesc::try_exec, but return a copy of the Pesc stack
+    /// at the time of the failure as well as an error.
     fn exec(&mut self, tok: PescToken)
         -> Result<(), (Vec<PescToken>, PescErrorType)>
     {
@@ -133,6 +145,23 @@ impl Pesc {
 
     // TODO: cleanup, remove duplicated code
     // here be atrocious code
+    /// Parse some input into a vector of Pesc tokens.
+    /// Note that the first element in the tuple (that is, the usize)
+    /// can be safely discarded.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let pesc = Pesc::new();
+    ///
+    /// let stuff = "1 1 + \\ 2 + [ack]";
+    /// let parsed = (Pesc::parse(stuff)).1;
+    ///
+    /// pesc.eval(parsed);
+    ///
+    /// // print the stack
+    /// pesc.stack.iter().rev().for_each(|i| println!("{}", i));
+    /// ```
     pub fn parse(input: &str) -> Result<(usize, Vec<PescToken>), PescError> {
         let mut toks = Vec::new();
 
@@ -307,6 +336,7 @@ impl Pesc {
         Ok((i, toks))
     }
 
+    /// Get a reference to the nth item in the Pesc stack.
     pub fn nth_ref(&self, i: PescNumber) -> Result<&PescToken, PescErrorType> {
         match self.stack.iter().rev().nth(i as usize) {
             Some(value) => Ok(value),
@@ -314,6 +344,7 @@ impl Pesc {
         }
     }
 
+    /// Set the nth value in the Pesc stack to a value.
     pub fn set(&mut self, i: PescNumber, v: PescToken) -> Result<(), PescErrorType> {
         let len = self.stack.len();
         if len <= i as usize {
@@ -324,10 +355,12 @@ impl Pesc {
         }
     }
 
+    /// Push an item to the stack.
     pub fn push(&mut self, v: PescToken) {
         self.stack.push(v)
     }
 
+    /// Pop the first item on the stack.
     pub fn pop(&mut self) -> Result<PescToken, PescErrorType> {
         match self.stack.pop() {
             Some(value) => Ok(value),
@@ -337,6 +370,8 @@ impl Pesc {
 
     // TODO: merge pop_* into a single function (so we don't have all
     // this duplicated code)
+    /// Pop the first value off of the stack, returning an error if the
+    /// value is not a number.
     pub fn pop_number(&mut self) -> Result<PescNumber, PescErrorType> {
         let v = self.pop()?;
 
@@ -348,6 +383,8 @@ impl Pesc {
         }
     }
 
+    /// Pop the first value off of the stack, returning an error if the
+    /// value is not a string.
     pub fn pop_string(&mut self) -> Result<String, PescErrorType> {
         let v = self.pop()?;
 
@@ -359,6 +396,8 @@ impl Pesc {
         }
     }
 
+    /// Pop the first value off of the stack, returning an error if the
+    /// value is not a macro.
     pub fn pop_macro(&mut self) -> Result<Vec<PescToken>, PescErrorType> {
         let v = self.pop()?;
 
@@ -370,6 +409,9 @@ impl Pesc {
         }
     }
 
+    /// Pop the first value off of the stack, returning an error if the
+    /// value is not a boolean value (i.e., is not a string, number, or
+    /// bool)
     pub fn pop_boolean(&mut self) -> Result<bool, PescErrorType> {
         let v = self.pop()?;
         match v {
