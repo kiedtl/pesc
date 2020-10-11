@@ -121,24 +121,22 @@ impl fmt::Display for TermColor {
 }
 
 pub enum OutputStream {
-    Stdout,
-
     // listen, rustc, I understand they're not being
     // used right now, but you really don't need to raise
     // a fuss about that now
 
+    //Stdout,
     //Stderr,
-    //Stdin,
-    //Other(usize),
+
+    Stdin,
 }
 
 impl Into<c_int> for OutputStream {
     fn into(self) -> c_int {
         match self {
-            OutputStream::Stdout   => 1 as c_int,
+            //OutputStream::Stdout   => 1 as c_int,
             //OutputStream::Stderr   => 2 as c_int,
-            //OutputStream::Other(f) => f as c_int,
-            //OutputStream::Stdin    => 0 as c_int,
+            OutputStream::Stdin    => 0 as c_int,
         }
     }
 }

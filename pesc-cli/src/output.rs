@@ -34,7 +34,7 @@ pub enum OutputMode {
 
 impl OutputMode {
     pub fn auto() -> OutputMode {
-        if tty::is_tty(OutputStream::Stdout) {
+        if tty::is_tty(OutputStream::Stdin) {
             OutputMode::Human
         } else {
             OutputMode::Simple
