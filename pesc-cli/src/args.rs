@@ -23,8 +23,6 @@ use std::env;
 #[derive(Clone, Debug)]
 pub struct Options {
     pub file: Option<String>,
-    pub load_lua: bool,
-    pub load_extra: Option<String>,
     pub output: OutputMode,
     pub verbose: bool,
 }
@@ -34,8 +32,6 @@ impl Options {
     pub fn new() -> Self {
         Self {
             file: None,
-            load_lua: false,
-            load_extra: None,
             output: OutputMode::auto(),
             verbose: false,
         }
@@ -50,12 +46,7 @@ impl Options {
         opts.optflag("h", "help", "print this help message.");
         opts.optflag("V", "version", "print the version.");
         opts.optflag("q", "quiet", "reduce output.");
-        opts.optflag("i", "", "force interactive mode.");
-        opts.optflag("l", "load", "load extended stdlib from $PESCLIBS.");
         opts.optflag("v", "verbose", "show elapsed time.");
-
-        opts.optopt("L", "lua", "load the Lua file(s) in <PATH>.",
-            "PATH");
 
         let matches = match opts.parse(&args[1..]) {
             Ok(ma) => ma,
@@ -79,8 +70,6 @@ impl Options {
             None
         };
 
-        self.load_lua = matches.opt_present("l");
-        self.load_extra = matches.opt_str("L");
         self.verbose = matches.opt_present("v");
 
         self.output = {
@@ -106,8 +95,6 @@ Options:
     -h, --help             print this help message.
     -V, --version          print the version and license info.
     -q, --quiet            reduce output.
-    -l, --load             load extended stdlib from $PESCLIBS.
-    -L, --lua     [PATH]   load the Lua file(s) in <PATH>.
 
 Full documentation is available as a manpage (pescli(1)).
 Source: https://github.com/lptstr/pesc
