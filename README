@@ -26,6 +26,13 @@ PESC is not:
 3. a scripting language.
 
 
+Usage
+=====
+
+
+TODO
+
+
 Examples
 ========
 
@@ -75,3 +82,22 @@ Philae spacecraft.
 5. GNU bc, the omnipresent basic calculator
 6. Nerdypepper's eva (https://github.com/nerdypepper/eva). If you don't
 like stack-based languages, you should check this out.
+
+
+Todo
+====
+
+There still remains a lot to be done. See the TODO file for more
+information.
+
+
+Copyright
+=========
+
+Copyright (c) 2020 Kiëd Llaentenn <kiedtl [at] protonmail [dot] com>
+
+The core functionality (pesc-lib) is licensed under the MIT license. (See
+pesc-lib/COPYING)
+
+The command-line utility is licensed under the GNU GPLv3 license. (See
+pesc-cli/COPYING)
