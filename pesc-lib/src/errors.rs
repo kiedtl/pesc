@@ -76,7 +76,7 @@ impl PescError {
         }
     }
 
-    fn hints(&self) -> Vec<String> {
+    pub fn hints(&self) -> Vec<String> {
         match self.kind {
             PescErrorType::UnknownFunction(_) => vec![
                 "is the function loaded correctly?".to_string(),

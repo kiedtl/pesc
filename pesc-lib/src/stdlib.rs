@@ -584,4 +584,3 @@ fn pesc_run(p: &mut Pesc) -> Result<(), PescErrorType> {
     let f = p.pop()?;
     p.try_exec(f)
 }
-
