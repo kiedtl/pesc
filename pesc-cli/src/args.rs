@@ -76,7 +76,9 @@ impl Options {
             // if -q is set, force quiet mode
             if matches.opt_present("q") {
                 OutputMode::Quiet
-            } else {
+            } else if let Some(_) = self.file {
+                OutputMode::Simple
+            }else {
                 // default to the previous value,
                 // which is set automatically based on
                 // whether stdout is a tty or not
