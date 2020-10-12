@@ -39,35 +39,31 @@ Also included in Pesc are the following types:
 
 # EXAMPLES
 
-```
-1 2 +\\*
-```
+*Example 1:*    1 2 +\\\*
 
-- '1': push 1 to the stack.
-	stack: 1
-- '1': push 2 to the stack.
-	stack: 2 1
-- '+': add the first two values on the stack and push the result.
-	stack: 3
-- '\\': duplicate the first value on the stack.
-	stack: 3 3
-- '\*': multiply the first two values on the stack and push the result.
-	stack: 6
+- `1`: push 1 to the stack.
+   stack: 1
+- `1`: push 2 to the stack.
+   stack: 2 1
+- `+`: add the first two values on the stack and push the result.
+   stack: 3
+- `\\`: duplicate the first value on the stack.
+   stack: 3 3
+- `\*`: multiply the first two values on the stack and push the result.
+   stack: 6
 
-```
-3 2 ^ [sqrt]
-```
+*Example 2:*    3 2 ^ [sqrt]
 
-- '3': push 3 to the stack.
-	stack: 3
-- '2': push 2 to the stack.
-	stack: 2 3
-- '^': raise the second value on the stack to the power of the first
+- `3`: push 3 to the stack.
+   stack: 3
+- `2`: push 2 to the stack.
+   stack: 2 3
+- `^`: raise the second value on the stack to the power of the first
    item, and push the result.
-	stack: 9
-- '[sqrt]': call the 'sqrt' function, which pushes the square root
+   stack: 9
+- `[sqrt]`: call the 'sqrt' function, which pushes the square root
   of the first item to the stack.
-	stack: 3
+   stack: 3
 
 
 # STANDARD LIBRARY
