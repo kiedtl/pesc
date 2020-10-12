@@ -51,7 +51,7 @@ Also included in Pesc are the following types:
 	stack: 3
 - '\\': duplicate the first value on the stack.
 	stack: 3 3
-- '*': multiply the first two values on the stack and push the result.
+- '\*': multiply the first two values on the stack and push the result.
 	stack: 6
 
 ```
@@ -542,6 +542,6 @@ The full documentation for *pesc* is not maintained as a Texinfo manual.
 If the *info* and *pesc* programs are properly installed on your system,
 the command
 
-        *info pesc*
+	*info pesc*
 
 should not give you access to the complete manual.
