@@ -29,8 +29,49 @@ PESC is not:
 Usage
 =====
 
+See the INSTALL file for installation information.
 
-TODO
+To use, simply run pescli:
+
++--------------------------------------------------------------------------+
+| $ pescli -q                                                              |
+| pesc> 45345245 [prime]                                                   |
+| (false)                                                                  |
+| pesc> ^D                                                                 |
+| $                                                                        |
++--------------------------------------------------------------------------+
+
+You may also run pescli with a file:
+
++--------------------------------------------------------------------------+
+| $ cat ./file                                                             |
+| 15 [fact]                                                                |
+| $ pescli ./file                                                          |
+| 1307674368000                                                            |
+| $                                                                        |
++--------------------------------------------------------------------------+
+
+Here's the (short) help message for pescli:
+
++--------------------------------------------------------------------------+
+| $ pescli -h                                                              |
+| Usage: pescli [OPTION]... [FILE]                                         |
+| Copyright (c) 2020 Kiëd Llaentenn                                        |
+|                                                                          |
+| Options:                                                                 |
+|     -h, --help             Print a this help message and exit.           |
+|     -V, --version          Print pescli's version and exit.              |
+|     -q, --quiet            Print as little information as possible.      |
+|                                                                          |
+| Full documentation is available as a manpage (pescli(1)).                |
+| Source: https://github.com/lptstr/pesc                                   |
+| Reporting issues: https://github.com/lptstr/pesc/issues/new              |
+|                                                                          |
+| $                                                                        |
++--------------------------------------------------------------------------+
+
+See pesc(7) for information about Pesc's syntax, and pescli(1) for infor-
+mation regarding the cli tool.
 
 
 Examples
