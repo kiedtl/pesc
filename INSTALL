@@ -1,0 +1,21 @@
+Installation
+============
+
+You will need:
+    - a POSIXy system (Windows is not supported at present.)
+    - rustup/Cargo
+    - scdoc [0] and just [1]
+
+Then:
+
++--------------------------------------------------------------------+
+| $ ls                              # must be in root directory      |
+| docs  examples INSTALL justfile pesc-cli pesc-lib README TODO      |
+| # just install                    # install in /usr/local/, or...  |
+| $ just prefix=~/local/ install    # install in ~/local/            |
++--------------------------------------------------------------------+
+
+Consult pesc(7) and pescli(1) for usage information.
+
+[0]: scdoc: https://git.sr.ht/~sircmpwn/scdoc
+[1]: just:  https://github.com/casey/just
