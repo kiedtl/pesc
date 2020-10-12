@@ -1,24 +1,26 @@
 There still remains a lot to be done. (In particular, some unit tests
 would be nice!)
 
-TODO-items are ordered by priority.
+Items are ordered by priority.
 
 - **WRITE UNIT TESTS**
 - **WRITE INTEGRATION TESTS**
-- Add a --fix flag to Pescli that controls the number of decimal points
-  displayed.
-- Add a --base flag to Pescli that controls the radix of calculation
-  output.
 - Quickstart guide/examples for pesc-lib.
 - Examples for pesc's language.
-- Trim down on dependencies.
-    - Pescli: terminal_size should be implemented by hand with `ioctl`.
-    - Check if unneeded features in dependencies can be disabled.
-    - et cetera
+- Add log10/log2 functions to the standard library.
 - the [dbg] function, which is supposed to print out the contents
   of a macro on the stack.
 - Registers (aka alternative stacks, or variables, or whatever) similar
   in functionality to dc's registers.
+  - Implement a [fib] function *in Pesc* as an example.
+- Add a --fix flag to Pescli that controls the number of decimal points
+  displayed.
+- Add a --base flag to Pescli that controls the radix of calculation
+  output.
+- Trim down on dependencies.
+    - Pescli: terminal_size should be implemented by hand with `ioctl`.
+    - Check if unneeded features in dependencies can be disabled.
+    - et cetera
 - Better error displays for Pescli. Ideally, error displays should
   be accompanied with the offending line/column of code. Something
   similar to rustc's/clang's errors would be nice.
