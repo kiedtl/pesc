@@ -43,10 +43,10 @@ impl Options {
 
         let mut opts = g_Options::new();
 
-        opts.optflag("h", "help", "print this help message.");
-        opts.optflag("V", "version", "print the version.");
-        opts.optflag("q", "quiet", "reduce output.");
-        opts.optflag("v", "verbose", "show elapsed time.");
+        opts.optflag("h", "help",     "");
+        opts.optflag("V", "version",  "");
+        opts.optflag("q", "quiet",    "");
+        opts.optflag("v", "verbose",  "");
 
         let matches = match opts.parse(&args[1..]) {
             Ok(ma) => ma,
@@ -73,10 +73,11 @@ impl Options {
         self.verbose = matches.opt_present("v");
 
         self.output = {
-            // if -q is set, force quiet mode
             if matches.opt_present("q") {
+                // if -q is set, force quiet mode
                 OutputMode::Quiet
             } else if let Some(_) = self.file {
+                // if we're reading from a file, use quiet mode
                 OutputMode::Simple
             }else {
                 // default to the previous value,
@@ -96,6 +97,7 @@ Copyright (c) 2020 Kiëd Llaentenn
 Options:
     -h, --help             Print a this help message and exit.
     -V, --version          Print pescli's version and exit.
+    -v, --verbose          Print extra information.
     -q, --quiet            Print as little information as possible.
 
 Full documentation is available as a manpage (pescli(1)).

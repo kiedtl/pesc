@@ -20,6 +20,9 @@ information.
 *-V, --version*
 	Print pescli's version and exit.
 
+*-v, --verbose*
+	Print extra information.
+
 *-q, --quiet*
 	Print as little information as possible.
 
