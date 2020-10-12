@@ -38,6 +38,7 @@ pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
         (Some('+'),  "add",  rc_box!(pesc_add)),
         (Some('-'),  "sub",  rc_box!(pesc_sub)),
         (Some('*'),  "mul",  rc_box!(pesc_mul)),
+        (Some('×'),  "mul",  rc_box!(pesc_mul)),
         (Some('/'),  "div",  rc_box!(pesc_div)),
         (Some('÷'),  "div",  rc_box!(pesc_div)),
         (Some('^'),  "pow",  rc_box!(pesc_pow)),
@@ -76,16 +77,17 @@ pub fn standard<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
 /// ```
 pub fn extended<'a>() -> Vec<(Option<char>, &'a str, Rc<Box<PescFunc>>)> {
     vec![
-        (Some('!'), "neg",  rc_box!(pesc_b_neg)),
+        (Some('!'), "neg",     rc_box!(pesc_b_neg)),
         (None,      "and",     rc_box!(pesc_b_and)),
         (None,      "or",      rc_box!(pesc_b_or)),
         (None,      "eq?",     rc_box!(pesc_b_eq)),
         (None,      "gt?",     rc_box!(pesc_b_gt)),
+        (None,      "gte",     rc_box!(pesc_ex_gte)),
         (None,      "lt?",     rc_box!(pesc_b_lt)),
+        (None,      "lte",     rc_box!(pesc_ex_lte)),
+
         (Some('?'), "if?",     rc_box!(pesc_b_cond)),
 
-        (None,      "lte",     rc_box!(pesc_ex_lte)),
-        (None,      "gte",     rc_box!(pesc_ex_gte)),
         (None,      "def",     rc_box!(pesc_ex_def)),
         (Some('s'), "size",    rc_box!(pesc_ex_size)),
         (Some('r'), "rand",    rc_box!(pesc_ex_rand)),
