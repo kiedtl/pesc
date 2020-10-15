@@ -72,8 +72,8 @@ Also included in Pesc are the following types:
 
 [- *OPERATOR*
 :[ *NAME*
-:[ *ARGUMENTS*
-:[ *RETURN VALUE*
+:[ *ARGS*
+:[ *RETURN TYPE*
 :< *DESCRIPTION*
 |  +
 :  add
@@ -112,8 +112,8 @@ Also included in Pesc are the following types:
 
 [- *OPERATOR*
 :[ *NAME*
-:[ *ARGUMENTS*
-:[ *RETURN VALUE*
+:[ *ARGS*
+:[ *RETURN TYPE*
 :< *DESCRIPTION*
 |  (backslash)
 :  dup
@@ -146,8 +146,8 @@ Also included in Pesc are the following types:
 
 [- *OPERATOR*
 :[ *NAME*
-:[ *ARGUMENTS*
-:[ *RETURN VALUE*
+:[ *ARGS*
+:[ *RETURN TYPE*
 :< *DESCRIPTION*
 |  &
 :  band
@@ -185,8 +185,8 @@ Also included in Pesc are the following types:
 
 [- *OPERATOR*
 :[ *NAME*
-:[ *ARGUMENTS*
-:[ *RETURN VALUE*
+:[ *ARGS*
+:[ *RETURN TYPE*
 :< *DESCRIPTION*
 |  ;
 :  run
@@ -214,9 +214,9 @@ Also included in Pesc are the following types:
 *Boolean functions:*
 
 [- *OPERATOR*
-:[ *FUNCTION NAME*
-:[ *ARGUMENTS*
-:[ *RETURN VALUE*
+:[ *NAME*
+:[ *ARGS*
+:[ *RETURN TYPE*
 :< *DESCRIPTION*
 |  !
 :  neg
@@ -269,9 +269,9 @@ Also included in Pesc are the following types:
 *Trigonometric functions:*
 
 [- *OPERATOR*
-:[ *FUNCTION NAME*
-:[ *ARGUMENTS*
-:[ *RETURN VALUE*
+:[ *NAME*
+:[ *ARGS*
+:[ *RETURN TYPE*
 :< *DESCRIPTION*
 |   
 :  sin
@@ -314,9 +314,9 @@ Also included in Pesc are the following types:
 *Other math functions:*
 
 [- *OPERATOR*
-:[ *FUNCTION NAME*
-:[ *ARGUMENTS*
-:[ *RETURN VALUE*
+:[ *NAME*
+:[ *ARGS*
+:[ *RETURN TYPE*
 :< *DESCRIPTION*
 |  l
 :  log
