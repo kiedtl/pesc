@@ -43,7 +43,7 @@ Also included in Pesc are the following types:
 
 - `1`: push 1 to the stack.
    stack: 1
-- `1`: push 2 to the stack.
+- `2`: push 2 to the stack.
    stack: 2 1
 - `+`: add the first two values on the stack and push the result.
    stack: 3
